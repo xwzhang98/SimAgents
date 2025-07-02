@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "./ICs",
+    "FileBase": "TNG300-DM-1_ICs",
+    "BoxSize": 205000.0,
+    "Ngrid": 2500,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "./Planck2015_CAMB.txt",
+    "Omega0": 0.3089,
+    "OmegaBaryon": 0.0486,
+    "OmegaLambda": 0.6911,
+    "HubbleParam": 0.6774,
+    "ProduceGas": 0,
+    "Redshift": 127.0,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "./ICs/TNG300-DM-1_ICs",
+    "OutputDir": "./output",
+    "OutputList": "0,1,3,7",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 0,
+    "CoolingOn": 0,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 0,
+    "StarformationOn": 0,
+    "WindOn": 0,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 0,
+    "Omega0": 0.3089
+  }
+}

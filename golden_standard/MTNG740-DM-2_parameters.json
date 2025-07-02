@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "./ICs/",
+    "FileBase": "MTNG740-DM-2",
+    "BoxSize": 500000.0,
+    "Ngrid": 2160,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "Planck2016_matterpower.dat",
+    "Omega0": 0.3089,
+    "OmegaBaryon": 0.0486,
+    "OmegaLambda": 0.6911,
+    "HubbleParam": 0.6774,
+    "ProduceGas": 0,
+    "Redshift": 63,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "./ICs/MTNG740-DM-2",
+    "OutputDir": "./output/",
+    "OutputList": "0,0.25,0.5,1.0,1.5,2.0,3.0,4.0,5.0,7.04",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 0,
+    "CoolingOn": 0,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 0,
+    "StarformationOn": 0,
+    "WindOn": 0,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 0,
+    "Omega0": 0.3089
+  }
+}

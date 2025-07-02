@@ -1,0 +1,37 @@
+{
+  "genic": {
+    "OutputDir": "/path/to/MTNG740/ICs/",
+    "FileBase": "MTNG740",
+    "BoxSize": 500,
+    "Ngrid": 4320,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "/path/to/CAMB/camb_millenniumtng.dat",
+    "Omega0": 0.3111,
+    "OmegaBaryon": 0.04897,
+    "OmegaLambda": 0.6889,
+    "HubbleParam": 0.6766,
+    "ProduceGas": 1,
+    "Redshift": 30,
+    "Seed": 12345,
+    "PrimordialAmp": 2.105e-09,
+    "PrimordialIndex": 0.9665
+  },
+  "gadget": {
+    "InitCondFile": "/path/to/MTNG740/ICs/MTNG740",
+    "OutputDir": "/path/to/MTNG740/outputs/",
+    "OutputList": "/path/to/MTNG740/output_list.txt",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 1,
+    "CoolingOn": 1,
+    "SnapshotWithFOF": 1,
+    "BlackHoleOn": 1,
+    "StarformationOn": 1,
+    "WindOn": 1,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 1,
+    "Omega0": 0.3111,
+    "OmegaLambda": 0.6889,
+    "OmegaBaryon": 0.04897,
+    "HubbleParam": 0.6766
+  }
+}

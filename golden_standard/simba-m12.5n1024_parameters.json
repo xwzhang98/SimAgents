@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "./ICs/",
+    "FileBase": "m12.5n1024",
+    "BoxSize": 12500.0,
+    "Ngrid": 1024,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "planck2016_m12.5n1024.txt",
+    "Omega0": 0.3,
+    "OmegaBaryon": 0.048,
+    "OmegaLambda": 0.7,
+    "HubbleParam": 0.68,
+    "ProduceGas": 1,
+    "Redshift": 249,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "./ICs/m12.5n1024",
+    "OutputDir": "./output/m12.5n1024/",
+    "OutputList": "0.02,0.05,0.1,0.2,0.5,1.0",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 1,
+    "CoolingOn": 1,
+    "SnapshotWithFOF": 1,
+    "BlackHoleOn": 1,
+    "StarformationOn": 1,
+    "WindOn": 1,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 1,
+    "Omega0": 0.3
+  }
+}

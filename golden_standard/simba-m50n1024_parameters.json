@@ -1,0 +1,35 @@
+{
+  "genic": {
+    "OutputDir": "/path/to/ICs/",
+    "FileBase": "m50n1024",
+    "BoxSize": "50000.0",
+    "Ngrid": "1024",
+    "WhichSpectrum": "2",
+    "FileWithInputSpectrum": "/path/to/powerspectrum.txt",
+    "Omega0": "0.3",
+    "OmegaBaryon": "0.048",
+    "OmegaLambda": "0.7",
+    "HubbleParam": "0.68",
+    "ProduceGas": "1",
+    "Redshift": "249",
+    "Seed": "12345"
+  },
+  "gadget": {
+    "InitCondFile": "/path/to/ICs/m50n1024",
+    "OutputDir": "/path/to/sim_outputs/",
+    "OutputList": "0.1,0.2,0.5,1.0",
+    "TimeLimitCPU": "86400",
+    "MetalReturnOn": "1",
+    "CoolingOn": "1",
+    "SnapshotWithFOF": "1",
+    "BlackHoleOn": "1",
+    "StarformationOn": "1",
+    "WindOn": "1",
+    "MassiveNuLinRespOn": "0",
+    "DensityIndependentSphOn": "1",
+    "Omega0": "0.3",
+    "OmegaLambda": "0.7",
+    "OmegaBaryon": "0.048",
+    "HubbleParam": "0.68"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "<user must specify, e.g., ./ICs/>",
+    "FileBase": "<user must specify, e.g., TNG100-1_IC>",
+    "BoxSize": 75000.0,
+    "Ngrid": 1820,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "<user must specify, e.g., Planck2015_matterpower.dat>",
+    "Omega0": 0.3089,
+    "OmegaBaryon": 0.0486,
+    "OmegaLambda": 0.6911,
+    "HubbleParam": 0.6774,
+    "ProduceGas": 1,
+    "Redshift": 127,
+    "Seed": "<user must specify, e.g., 12345>"
+  },
+  "gadget": {
+    "InitCondFile": "<genic OutputDir>/<genic FileBase>",
+    "OutputDir": "<user must specify, e.g., ./output/>",
+    "OutputList": "0.0078,0.0476,0.0769,0.0909,0.1111,0.1429,0.2,0.25,0.3333,0.5,0.6667,0.8333,1.0",
+    "TimeLimitCPU": "<user must specify, e.g., 86400 for 24 hours>",
+    "MetalReturnOn": 1,
+    "CoolingOn": 1,
+    "SnapshotWithFOF": 1,
+    "BlackHoleOn": 1,
+    "StarformationOn": 1,
+    "WindOn": 1,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 1,
+    "Omega0": 0.3089
+  }
+}

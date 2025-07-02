@@ -1,0 +1,33 @@
+{
+  "genic": {
+    "OutputDir": "./ICs_TNG300_DM2/",
+    "FileBase": "TNG300-DM-2",
+    "BoxSize": 205000.0,
+    "Ngrid": 1250,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "./Planck2015_TNG300DM2.txt",
+    "Omega0": 0.3089,
+    "OmegaBaryon": 0.0486,
+    "OmegaLambda": 0.6911,
+    "HubbleParam": 0.6774,
+    "ProduceGas": 0,
+    "Redshift": 127.0,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "./ICs_TNG300_DM2/TNG300-DM-2",
+    "OutputDir": "./output_TNG300_DM2/",
+    "OutputList": "0.02,0.05,0.1,0.2,0.5,1.0",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 0,
+    "CoolingOn": 0,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 0,
+    "StarformationOn": 0,
+    "WindOn": 0,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 0,
+    "Omega0": 0.3089
+  },
+  "comment": "All required parameters for both MP-GenIC and MP-Gadget have been included and validated against the MP-Gadget manual (GenIC: section 4, p.12-19; Gadget: section 5, p.20-37). BoxSize, Ngrid, Omega0, OmegaBaryon, OmegaLambda, HubbleParam, ProduceGas, and Redshift are set according to the TNG300-DM-2 cosmology and simulation setup (see TNG300-DM-2 paper, Section 2.1 and Table 1). WhichSpectrum=2 is chosen for a tabulated CAMB/CLASS power spectrum, as described in the paper. FileWithInputSpectrum, OutputDir, FileBase, Seed, InitCondFile, OutputList, and TimeLimitCPU are not specified in the paper and must be set by the user; example values are provided for reproducibility. All feedback and baryonic modules are disabled for a DM-only run, as appropriate for TNG300-DM-2. All parameter names, types, and units match the MP-Gadget documentation. No optional parameters are included, as none are required or specified for this configuration. All dependencies and required fields are satisfied."
+}

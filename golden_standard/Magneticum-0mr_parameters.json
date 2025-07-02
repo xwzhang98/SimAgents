@@ -1,0 +1,31 @@
+{
+  "genic": {
+    "OutputDir": "ICs/0mr/",
+    "FileBase": "0mr",
+    "BoxSize": 5423295.0,
+    "Ngrid": 4563,
+    "WhichSpectrum": 1,
+    "Omega0": 0.272,
+    "OmegaBaryon": 0.0456,
+    "OmegaLambda": 0.728,
+    "HubbleParam": 0.704,
+    "ProduceGas": 1,
+    "Redshift": 60,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "ICs/0mr/0mr",
+    "OutputDir": "output/0mr/",
+    "OutputList": "0,0.13,0.3,0.5,0.8,1",
+    "TimeLimitCPU": 0,
+    "MetalReturnOn": 1,
+    "CoolingOn": 1,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 1,
+    "StarformationOn": 1,
+    "WindOn": 1,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 1,
+    "Omega0": 0.272
+  }
+}

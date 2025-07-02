@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "./ICs/",
+    "FileBase": "TNG100-3_ICs",
+    "BoxSize": "75000.0",
+    "Ngrid": "455",
+    "WhichSpectrum": "2",
+    "FileWithInputSpectrum": "Planck2015_CAMB_z127.dat",
+    "Omega0": "0.3089",
+    "OmegaBaryon": "0.0486",
+    "OmegaLambda": "0.6911",
+    "HubbleParam": "0.6774",
+    "ProduceGas": "1",
+    "Redshift": "127",
+    "Seed": "42"
+  },
+  "gadget": {
+    "InitCondFile": "./ICs/TNG100-3_ICs",
+    "OutputDir": "./output/TNG100-3/",
+    "OutputList": "1.0,0.5,0.2,0.1,0.05,0.02,0.01,0.0",
+    "TimeLimitCPU": "86400",
+    "MetalReturnOn": "1",
+    "CoolingOn": "1",
+    "SnapshotWithFOF": "0",
+    "BlackHoleOn": "1",
+    "StarformationOn": "1",
+    "WindOn": "1",
+    "MassiveNuLinRespOn": "0",
+    "DensityIndependentSphOn": "1",
+    "Omega0": "0.3089"
+  }
+}

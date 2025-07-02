@@ -1,0 +1,39 @@
+{
+  "genic": {
+    "OutputDir": "ICs/MTNG1500-DM-0.1nu/",
+    "FileBase": "MTNG1500-DM-0.1nu",
+    "BoxSize": 1020.0,
+    "Ngrid": 5120,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "camb_MTNG1500-DM-0.1nu.dat",
+    "Omega0": 0.3089,
+    "OmegaBaryon": 0.0486,
+    "OmegaLambda": 0.6911,
+    "HubbleParam": 0.6774,
+    "ProduceGas": 0,
+    "Redshift": 63,
+    "Seed": 0,
+    "NgridNu": 1280,
+    "MNue": 0.03333,
+    "Mnum": 0.03333,
+    "Mnut": 0.03333
+  },
+  "gadget": {
+    "InitCondFile": "ICs/MTNG1500-DM-0.1nu/MTNG1500-DM-0.1nu",
+    "OutputDir": "output/MTNG1500-DM-0.1nu/",
+    "OutputList": "133 outputs, log(a) spaced, z=30 to z=0",
+    "TimeLimitCPU": 0,
+    "MetalReturnOn": 0,
+    "CoolingOn": 0,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 0,
+    "StarformationOn": 0,
+    "WindOn": 0,
+    "MassiveNuLinRespOn": 1,
+    "DensityIndependentSphOn": 0,
+    "Omega0": 0.3089,
+    "MNue": 0.03333,
+    "Mnum": 0.03333,
+    "Mnut": 0.03333
+  }
+}

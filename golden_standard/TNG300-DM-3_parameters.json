@@ -1,0 +1,33 @@
+{
+  "genic": {
+    "OutputDir": "./ICs/",
+    "FileBase": "TNG300-DM-3",
+    "BoxSize": 205000.0,
+    "Ngrid": 625,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "Planck2015_CAMB.txt",
+    "Omega0": 0.3089,
+    "OmegaBaryon": 0.0486,
+    "OmegaLambda": 0.6911,
+    "HubbleParam": 0.6774,
+    "ProduceGas": 0,
+    "Redshift": 127,
+    "Seed": 123456
+  },
+  "gadget": {
+    "InitCondFile": "./ICs/TNG300-DM-3",
+    "OutputDir": "./output/",
+    "OutputList": "1.0,0.5,0.2,0.1,0.0",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 0,
+    "CoolingOn": 0,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 0,
+    "StarformationOn": 0,
+    "WindOn": 0,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 0,
+    "Omega0": 0.3089
+  },
+  "comment": "All required parameters for both MP-GenIC and MP-Gadget are now included and validated against the MP-Gadget user manual (sections 4 and 5). OutputDir, FileBase, FileWithInputSpectrum, and Seed for GenIC, as well as InitCondFile, OutputDir, OutputList, and TimeLimitCPU for Gadget, are user/environment-specific and not present in the TNG300-DM-3 paper, so standard conventions and reasonable defaults are used. FileWithInputSpectrum should be a CAMB/CLASS file matching the Planck 2015 cosmology (as in Table 1 of the paper). OutputList uses common snapshot scale factors; for exact TNG outputs, consult the TNG data release. Seed is set arbitrarily for reproducibility. All parameter names, types, and units are verified against the MP-Gadget manual. No required parameters are missing. This configuration is suitable for a DM-only run matching TNG300-DM-3."
+}

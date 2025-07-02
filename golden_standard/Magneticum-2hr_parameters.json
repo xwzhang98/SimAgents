@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "./ICs/",
+    "FileBase": "Magneticum_2hr",
+    "BoxSize": 711764,
+    "Ngrid": 1584,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "./power_spectrum.dat",
+    "Omega0": 0.272,
+    "OmegaBaryon": 0.0456,
+    "OmegaLambda": 0.728,
+    "HubbleParam": 0.704,
+    "ProduceGas": 1,
+    "Redshift": 60,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "./ICs/Magneticum_2hr",
+    "OutputDir": "./output/",
+    "OutputList": "0.3333,0.4545,0.5556,0.6667,0.7692,0.88496,1.0",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 1,
+    "CoolingOn": 1,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 1,
+    "StarformationOn": 1,
+    "WindOn": 1,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 1,
+    "Omega0": 0.272
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "genic": {
+    "OutputDir": "TNG300-3/ICs/",
+    "FileBase": "ics_TNG300-3",
+    "BoxSize": 205000.0,
+    "Ngrid": 625,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "camb_TNG300-3_matterpower.dat",
+    "Omega0": 0.3089,
+    "OmegaBaryon": 0.0486,
+    "OmegaLambda": 0.6911,
+    "HubbleParam": 0.6774,
+    "ProduceGas": 1,
+    "Redshift": 127,
+    "Seed": 12345,
+    "Sigma8": 0.8159,
+    "PrimordialIndex": 0.9667
+  },
+  "gadget": {
+    "InitCondFile": "TNG300-3/ICs/ics_TNG300-3",
+    "OutputDir": "TNG300-3/output/",
+    "OutputList": "0.125,0.25,0.5,1.0",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 1,
+    "CoolingOn": 1,
+    "SnapshotWithFOF": 1,
+    "BlackHoleOn": 1,
+    "StarformationOn": 1,
+    "WindOn": 1,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 1,
+    "Omega0": 0.3089
+  }
+}

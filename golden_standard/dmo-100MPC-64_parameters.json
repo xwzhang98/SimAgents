@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "output/genic/",
+    "FileBase": "LR_ICs",
+    "BoxSize": 100000.0,
+    "Ngrid": 64,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "wmap9_matterpower.dat",
+    "Omega0": 0.2814,
+    "OmegaBaryon": 0.0464,
+    "OmegaLambda": 0.7186,
+    "HubbleParam": 0.697,
+    "ProduceGas": 0,
+    "Redshift": 99,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "output/genic/LR_ICs",
+    "OutputDir": "output/gadget/",
+    "OutputList": "0.3333,1.0",
+    "TimeLimitCPU": 0,
+    "MetalReturnOn": 0,
+    "CoolingOn": 0,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 0,
+    "StarformationOn": 0,
+    "WindOn": 0,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 0,
+    "Omega0": 0.2814
+  }
+}

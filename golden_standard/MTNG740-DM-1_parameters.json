@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "MTNG740-DM-1/ICs/",
+    "FileBase": "MTNG740-DM-1",
+    "BoxSize": 500000.0,
+    "Ngrid": 4320,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "camb_MillenniumTNG.txt",
+    "Omega0": 0.3089,
+    "OmegaBaryon": 0.0486,
+    "OmegaLambda": 0.6911,
+    "HubbleParam": 0.6774,
+    "ProduceGas": 0,
+    "Redshift": 63,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "MTNG740-DM-1/ICs/MTNG740-DM-1",
+    "OutputDir": "MTNG740-DM-1/snapshots/",
+    "OutputList": "output_list.txt",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 0,
+    "CoolingOn": 0,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 0,
+    "StarformationOn": 0,
+    "WindOn": 0,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 0,
+    "Omega0": 0.3089
+  }
+}

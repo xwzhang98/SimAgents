@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "ICs/",
+    "FileBase": "MTNG630-DM-0.0nu",
+    "BoxSize": 430000.0,
+    "Ngrid": 2160,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "camb_m630_0.0nu.txt",
+    "Omega0": 0.3,
+    "OmegaBaryon": 0.048,
+    "OmegaLambda": 0.7,
+    "HubbleParam": 0.6777,
+    "ProduceGas": 0,
+    "Redshift": 63,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "ICs/MTNG630-DM-0.0nu",
+    "OutputDir": "output/",
+    "OutputList": "0,0.25,0.5,1.0,1.5",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 0,
+    "CoolingOn": 0,
+    "SnapshotWithFOF": 0,
+    "BlackHoleOn": 0,
+    "StarformationOn": 0,
+    "WindOn": 0,
+    "MassiveNuLinRespOn": 1,
+    "DensityIndependentSphOn": 0,
+    "Omega0": 0.3
+  }
+}

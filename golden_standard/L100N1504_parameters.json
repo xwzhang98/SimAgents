@@ -1,0 +1,34 @@
+{
+  "genic": {
+    "OutputDir": "./ICs/",
+    "FileBase": "L100N1504",
+    "BoxSize": 100000.0,
+    "Ngrid": 1504,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "camb_planck2013.dat",
+    "Omega0": 0.307,
+    "OmegaBaryon": 0.04825,
+    "OmegaLambda": 0.693,
+    "HubbleParam": 0.6777,
+    "ProduceGas": 1,
+    "Redshift": 127,
+    "Seed": 12345,
+    "Sigma8": 0.8288,
+    "PrimordialIndex": 0.9611
+  },
+  "gadget": {
+    "InitCondFile": "./ICs/L100N1504",
+    "OutputDir": "./output/",
+    "OutputList": "0.047619,0.050000,0.052632,0.055556,0.058824,0.062500,0.066667,0.071429,0.076923,0.083333,0.090909,0.100000,0.111111,0.125000,0.142857,0.166667,0.200000,0.250000,0.333333,0.500000,1.000000",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 1,
+    "CoolingOn": 1,
+    "SnapshotWithFOF": 1,
+    "BlackHoleOn": 1,
+    "StarformationOn": 1,
+    "WindOn": 1,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 1,
+    "Omega0": 0.307
+  }
+}

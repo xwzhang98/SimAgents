@@ -1,0 +1,40 @@
+{
+  "genic": {
+    "OutputDir": "ICs/4uhr/",
+    "FileBase": "IC_4uhr",
+    "BoxSize": 96800.0,
+    "Ngrid": 576,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "power_spectrum_eh1998_wmap7.txt",
+    "Omega0": 0.272,
+    "OmegaBaryon": 0.0456,
+    "OmegaLambda": 0.728,
+    "HubbleParam": 0.704,
+    "ProduceGas": 1,
+    "Redshift": 60,
+    "Seed": 12345,
+    "Sigma8": 0.809,
+    "PrimordialIndex": 0.963
+  },
+  "gadget": {
+    "InitCondFile": "ICs/4uhr/IC_4uhr",
+    "OutputDir": "output/4uhr/",
+    "OutputList": "0,0.13,0.3,0.5,0.8,1.2,2",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 1,
+    "CoolingOn": 1,
+    "SnapshotWithFOF": 1,
+    "BlackHoleOn": 1,
+    "StarformationOn": 1,
+    "WindOn": 1,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 1,
+    "Omega0": 0.272,
+    "OmegaLambda": 0.728,
+    "OmegaBaryon": 0.0456,
+    "HubbleParam": 0.704,
+    "BoxSize": 96800.0,
+    "PrimordialIndex": 0.963,
+    "Sigma8": 0.809
+  }
+}

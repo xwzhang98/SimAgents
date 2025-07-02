@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "output/m25n1024/",
+    "FileBase": "m25n1024",
+    "BoxSize": 25000.0,
+    "Ngrid": 1024,
+    "WhichSpectrum": 2,
+    "FileWithInputSpectrum": "Planck2016_m25n1024_powerspec.txt",
+    "Omega0": 0.3,
+    "OmegaBaryon": 0.048,
+    "OmegaLambda": 0.7,
+    "HubbleParam": 0.68,
+    "ProduceGas": 1,
+    "Redshift": 249,
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "output/m25n1024/m25n1024",
+    "OutputDir": "output/m25n1024/",
+    "OutputList": "0.333,0.4,0.5,0.67,1.0",
+    "TimeLimitCPU": 86400,
+    "MetalReturnOn": 1,
+    "CoolingOn": 1,
+    "SnapshotWithFOF": 1,
+    "BlackHoleOn": 1,
+    "StarformationOn": 1,
+    "WindOn": 1,
+    "MassiveNuLinRespOn": 0,
+    "DensityIndependentSphOn": 1,
+    "Omega0": 0.3
+  }
+}

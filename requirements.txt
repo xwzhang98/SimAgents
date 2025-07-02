@@ -1,0 +1,20 @@
+# SimAgents Dependencies
+
+# AutoGen framework for agent communication
+pyautogen>=0.2.0
+
+# OpenAI API client
+openai>=1.0.0
+
+# YAML processing
+PyYAML>=6.0
+
+# Environment variable loading
+python-dotenv>=1.0.0
+
+# Optional: For development and testing
+pytest>=7.0.0
+pytest-cov>=4.0.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.0.0

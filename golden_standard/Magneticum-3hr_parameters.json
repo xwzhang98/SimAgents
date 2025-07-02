@@ -1,0 +1,31 @@
+{
+  "genic": {
+    "OutputDir": "./ICs/",
+    "FileBase": "Magneticum_3hr",
+    "BoxSize": "258522",
+    "Ngrid": "576",
+    "WhichSpectrum": "1",
+    "Omega0": "0.272",
+    "OmegaBaryon": "0.0456",
+    "OmegaLambda": "0.728",
+    "HubbleParam": "0.704",
+    "ProduceGas": "1",
+    "Redshift": "60",
+    "Seed": "12345"
+  },
+  "gadget": {
+    "InitCondFile": "./ICs/Magneticum_3hr",
+    "OutputDir": "./outputs/",
+    "OutputList": "1.0,0.885,0.769,0.667,0.556,0.455,0.333",
+    "TimeLimitCPU": "86400",
+    "MetalReturnOn": "1",
+    "CoolingOn": "1",
+    "SnapshotWithFOF": "0",
+    "BlackHoleOn": "1",
+    "StarformationOn": "1",
+    "WindOn": "1",
+    "MassiveNuLinRespOn": "0",
+    "DensityIndependentSphOn": "1",
+    "Omega0": "0.272"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "genic": {
+    "OutputDir": "ICs/L050N0752/",
+    "FileBase": "L050N0752",
+    "BoxSize": "50000.0",
+    "Ngrid": "752",
+    "WhichSpectrum": "2",
+    "FileWithInputSpectrum": "Planck2013_CAMB_L050.txt",
+    "Omega0": "0.307",
+    "OmegaBaryon": "0.04825",
+    "OmegaLambda": "0.693",
+    "HubbleParam": "0.6777",
+    "ProduceGas": "1",
+    "Redshift": "127",
+    "Seed": 12345
+  },
+  "gadget": {
+    "InitCondFile": "ICs/L050N0752/L050N0752",
+    "OutputDir": "output/L050N0752/",
+    "OutputList": "0.047619,0.0625,0.076923,0.090909,0.100112,0.111111,0.125,0.142857,0.166667,0.181818,0.2,0.222222,0.25,0.285714,0.333333,0.365225,0.401956,0.442944,0.5,0.543997,0.575747,0.619835,0.665336,0.731064,0.84507,0.84507,0.908186,1.0",
+    "TimeLimitCPU": "86400",
+    "MetalReturnOn": "1",
+    "CoolingOn": "1",
+    "SnapshotWithFOF": "0",
+    "BlackHoleOn": "1",
+    "StarformationOn": "1",
+    "WindOn": "1",
+    "MassiveNuLinRespOn": "0",
+    "DensityIndependentSphOn": "1",
+    "Omega0": "0.307"
+  }
+}
