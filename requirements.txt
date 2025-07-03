@@ -12,6 +12,23 @@ PyYAML>=6.0
 # Environment variable loading
 python-dotenv>=1.0.0
 
+# Scientific computing and plotting
+numpy>=1.21.0
+matplotlib>=3.5.0
+scipy>=1.9.0
+
+# Optional: For density field visualization (density_field_agent.py)
+# Note: gaepsi2 may have compilation issues on some systems
+# Uncomment and install manually if you plan to use DensityFieldAgent with gaepsi2
+# Cython>=3.0.0
+# gaepsi2
+# bigfile
+# 
+# Installation tips for gaepsi2:
+# - May require manual compilation on macOS/ARM systems
+# - Consider using conda: conda install -c conda-forge gaepsi2
+# - Alternative: Use Docker container with pre-built gaepsi2
+
 # Optional: For development and testing
 pytest>=7.0.0
 pytest-cov>=4.0.0
