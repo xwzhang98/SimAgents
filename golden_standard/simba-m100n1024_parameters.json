@@ -12,7 +12,7 @@
     "HubbleParam": 0.68,
     "ProduceGas": 1,
     "Redshift": 249,
-    "Seed": 12345,
+    "Seed": 12345
   },
   "gadget": {
     "InitCondFile": "/path/to/ICs/m100n1024",
