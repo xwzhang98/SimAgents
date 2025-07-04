@@ -186,11 +186,11 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="Extract MP-Gadget parameters from scientific papers")
-    parser.add_argument("paper_path", help="Path to the PDF paper")
-    parser.add_argument("--output-dir", default="output", help="Output directory (default: output)")
+    parser.add_argument("--paper-path", help="Path to the PDF paper")
+    parser.add_argument("--output-dir", default="parameter_extraction_output/", help="Output directory (default: output)")
     parser.add_argument("--custom-prompt", help="Custom instruction for parameter extraction")
-    parser.add_argument("--mp-gadget-docs", help="Path to MP-Gadget documentation")
-    parser.add_argument("--max-iterations", type=int, default=2, help="Maximum iterations for refinement")
+    parser.add_argument("--mp-gadget-docs",required=False, help="Path to MP-Gadget documentation")
+    parser.add_argument("--max-iterations", required=False, type=int, default=2, help="Maximum iterations for refinement")
     
     args = parser.parse_args()
     
