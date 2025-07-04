@@ -1,0 +1,217 @@
+[
+  {
+    "pdf_file": "1502.07357v3.pdf",
+    "simulation_name": "Magneticum-0mr",
+    "instruction": "Focus on the simulation run named 0mr"
+  },
+  {
+    "pdf_file": "1502.07357v3.pdf",
+    "simulation_name": "Magneticum-1mr",
+    "instruction": "Focus on the simulation run named 1mr"
+  },
+  {
+    "pdf_file": "1502.07357v3.pdf",
+    "simulation_name": "Magneticum-2hr",
+    "instruction": "Focus on the simulation run named 2hr"
+  },
+  {
+    "pdf_file": "1502.07357v3.pdf",
+    "simulation_name": "Magneticum-3hr",
+    "instruction": "Focus on the simulation run named 3hr"
+  },
+  {
+    "pdf_file": "1502.07357v3.pdf",
+    "simulation_name": "Magneticum-4uhr",
+    "instruction": "Focus on the simulation run named 4uhr"
+  },
+  {
+    "pdf_file": "2105.01016v2.pdf",
+    "simulation_name": "dmo-100MPC-64",
+    "instruction": "Extract parameters for the low-resolution run mentioned in the paper"
+  },
+  {
+    "pdf_file": "2105.01016v2.pdf",
+    "simulation_name": "dmo-100MPC-512",
+    "instruction": "Extract parameters for the high-resolution run mentioned in the paper"
+  },
+  {
+    "pdf_file": "2111.01160v2.pdf",
+    "simulation_name": "astrid",
+    "instruction": ""
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG740-DM-1",
+    "instruction": "Focus on the simulation run named MTNG740-DM-1"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG740-DM-2",
+    "instruction": "Focus on the simulation run named MTNG740-DM-2"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG740-DM-3",
+    "instruction": "Focus on the simulation run named MTNG740-DM-3"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG740-DM-4",
+    "instruction": "Focus on the simulation run named MTNG740-DM-4"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG740-DM-5",
+    "instruction": "Focus on the simulation run named MTNG740-DM-5"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG185-DM",
+    "instruction": "Focus on the simulation run named MTNG185-DM"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG740",
+    "instruction": "Focus on the simulation run named MTNG740"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG185",
+    "instruction": "Focus on the simulation run named MTNG185"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG3000-DM-0.1nu",
+    "instruction": "Focus on the simulation run named MTNG3000-DM-0.1nu"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG1500-DM-0.1nu",
+    "instruction": "Focus on the simulation run named MTNG1500-DM-0.1nu"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG630-DM-0.3nu",
+    "instruction": "Focus on the simulation run named MTNG630-DM-0.3nu"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG630-DM-0.1nu",
+    "instruction": "Focus on the simulation run named MTNG630-DM-0.1nu"
+  },
+  {
+    "pdf_file": "2210.10059v2.pdf",
+    "simulation_name": "MTNG630-DM-0.0nu",
+    "instruction": "Focus on the simulation run named MTNG630-DM-0.0nu"
+  },
+  {
+    "pdf_file": "bluetides.pdf",
+    "simulation_name": "bluetides",
+    "instruction": ""
+  },
+  {
+    "pdf_file": "eagle.pdf",
+    "simulation_name": "L025N0376",
+    "instruction": "Focus on the simulation run named L025N0376"
+  },
+  {
+    "pdf_file": "eagle.pdf",
+    "simulation_name": "L025N0752",
+    "instruction": "Focus on the simulation run named L025N0752"
+  },
+  {
+    "pdf_file": "eagle.pdf",
+    "simulation_name": "L050N0752",
+    "instruction": "Focus on the simulation run named L050N0752"
+  },
+  {
+    "pdf_file": "eagle.pdf",
+    "simulation_name": "L100N1504",
+    "instruction": "Focus on the simulation run named L100N1504"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG300-1",
+    "instruction": "Focus on the simulation run named TNG300-1"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG300-2",
+    "instruction": "Focus on the simulation run named TNG300-2"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG300-3",
+    "instruction": "Focus on the simulation run named TNG300-3"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG300-DM-1",
+    "instruction": "Focus on the simulation run named TNG300-DM-1"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG300-DM-2",
+    "instruction": "Focus on the simulation run named TNG300-DM-2"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG300-DM-3",
+    "instruction": "Focus on the simulation run named TNG300-DM-3"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG100-1",
+    "instruction": "Focus on the simulation run named TNG100-1"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG100-2",
+    "instruction": "Focus on the simulation run named TNG100-2"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG100-3",
+    "instruction": "Focus on the simulation run named TNG100-3"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG100-DM-1",
+    "instruction": "Focus on the simulation run named TNG100-DM-1"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG100-DM-2",
+    "instruction": "Focus on the simulation run named TNG100-DM-2"
+  },
+  {
+    "pdf_file": "illustrisTNG.pdf",
+    "simulation_name": "TNG100-DM-3",
+    "instruction": "Focus on the simulation run named TNG100-DM-3"
+  },
+  {
+    "pdf_file": "millennium-xxl.pdf",
+    "simulation_name": "Millennium-XXL",
+    "instruction": ""
+  },
+  {
+    "pdf_file": "simba.pdf",
+    "simulation_name": "m100n1024",
+    "instruction": "Focus on the simulation run named m100n1024"
+  },
+  {
+    "pdf_file": "simba.pdf",
+    "simulation_name": "m50n1024",
+    "instruction": "Focus on the simulation run named m50n1024"
+  },
+  {
+    "pdf_file": "simba.pdf",
+    "simulation_name": "m25n1024",
+    "instruction": "Focus on the simulation run named m25n1024"
+  },
+  {
+    "pdf_file": "simba.pdf",
+    "simulation_name": "m12.5n1024",
+    "instruction": "Focus on the simulation run named m12.5n1024"
+  }
+]
