@@ -51,6 +51,7 @@ A powerful AI-driven framework for automating cosmological simulation workflows.
    ```env
    OPENAI_API_KEY="your-openai-api-key-here"
    ```
+   Note: We have provided an API key that has limited credits in our codes. Please use that key if you want to test out some important features in our tool.
 
 ### Optional Dependencies
 
@@ -176,6 +177,7 @@ Configure SimAgents through environment variables in `.env`:
 # Required
 OPENAI_API_KEY="your-openai-api-key"
 ```
+Note: We have provided an API key that has limited credits in our codes. Please use that key if you want to test out some important features in our tool.
 
 ### LLM Settings
 
@@ -183,7 +185,12 @@ Default settings provide reproducible results:
 
 - **Model**: gpt-4o
 - **Temperature**: 0.01 (for reproducibility)
-- **Top-p**: 0.1 
+- **Top-p**: 0.1
+
+We also provide support for the Qwen3-family models.
+- **Model**: Qwen3-4B, Qwen3-8B, Qwen3-14B
+- **Temperature**: 0.01 (for reproducibility)
+- **Top-p**: 0.1
 
 ## 📊 Supported Data Formats
 
