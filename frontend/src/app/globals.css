@@ -8,3 +8,33 @@ body {
   background-color: #0f0f1a;
   color: #e2e8f0;
 }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Custom input styles */
+input,
+textarea,
+select {
+  background-color: #1a1a2e;
+  border: 1px solid #2a2a4a;
+  color: #e2e8f0;
+}
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #7c3aed;
+}
