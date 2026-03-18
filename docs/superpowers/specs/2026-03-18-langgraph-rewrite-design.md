@@ -69,7 +69,8 @@ SimAgents/
 Key decisions:
 - Everything inside `simagents/` package — importable as library or usable as CLI
 - No `baseline/` directory on this branch
-- `golden_standard/`, `example/`, `data/` carry over unchanged
+- `golden_standard/`, `example/` carry over unchanged
+- `data/software_docs/` is **new** — must be created and populated with reference docs for each supported simulation software (MP-Gadget docs exist in the current system via OpenAI vector stores; these need to be exported/written as markdown files)
 - Prompts in markdown files, not hardcoded in Python
 
 ---
@@ -206,7 +207,7 @@ class ExtractionInput(TypedDict):
     paper_path: str | None          # PDF path, or None for chat mode
     user_parameters: dict | None    # User-provided params, or None
     target_software: str            # "mp-gadget" | "arepo" | "gadget-4" | etc.
-    custom_prompt: str              # Optional additional instructions
+    custom_prompt: str | None       # Optional additional instructions
 
 class ExtractionOutput(TypedDict):
     genic_parameters: dict
@@ -214,22 +215,23 @@ class ExtractionOutput(TypedDict):
     status: str                     # "complete" | "incomplete"
     missing: list[str]
     comment: str
+    sources: list[dict]             # Provenance: [{param, value, location, page}]
 ```
 
 ### Internal state (superset of input/output)
 
 ```python
+from typing import Annotated
+from langchain_core.messages import BaseMessage
+from langgraph.graph.message import add_messages
+
 class ExtractionState(TypedDict):
     # Input
     input_mode: str                         # "paper" | "chat" | "hybrid"
     paper_path: str | None
     user_parameters: dict | None
     target_software: str
-    custom_prompt: str
-
-    # RAG resources
-    paper_retriever: VectorStoreRetriever | None
-    docs_retriever: VectorStoreRetriever
+    custom_prompt: str | None               # Optional — defaults to None
 
     # Extraction state
     raw_parameters: str
@@ -240,7 +242,28 @@ class ExtractionState(TypedDict):
     user_answers: list[dict]
     iteration: int
     max_iterations: int
-    messages: list
+    messages: Annotated[list[BaseMessage], add_messages]  # Auto-accumulates across iterations
+```
+
+**Note on RAG resources:** Retrievers (`VectorStoreRetriever`) are **not** stored in state — they are not serializable, and LangGraph requires serializable state for checkpointing (needed by `interrupt()`). Instead, retrievers are passed via LangGraph's `configurable` dict at graph invocation time:
+
+```python
+graph.invoke(
+    {"paper_path": "paper.pdf", "target_software": "mp-gadget"},
+    config={"configurable": {"paper_retriever": retriever, "docs_retriever": docs_retriever}}
+)
+```
+
+Nodes access retrievers via `config` parameter, not state. The `load_sources` node builds the retrievers and stores them in the config for downstream nodes.
+
+### Checkpointer
+
+The graph requires a checkpointer for `interrupt()` to work. Default: `MemorySaver` (in-memory, sufficient for CLI usage). For web/API deployments, swap to `SqliteSaver` or `PostgresSaver`:
+
+```python
+from langgraph.checkpoint.memory import MemorySaver
+
+graph = create_extraction_graph(config, checkpointer=MemorySaver())
 ```
 
 ### Graph topology
@@ -362,16 +385,37 @@ class DensityFieldPlotter:
 Changes from current:
 - Use `init_chat_model()` instead of hardcoded GPT-4o
 - Use config system instead of hardcoded paths
-- Remove ag2 dependency — direct LLM calls + `subprocess`/LangChain `PythonREPL` for code execution
+- Remove ag2 dependency — direct LLM calls + `subprocess`/`langchain_experimental.tools.PythonREPL` for code execution
 - Same model-agnostic design as the main graph
 
 ---
 
-## 9. Dependencies
+## 9. Error Handling
+
+**Philosophy: fail fast with clear messages.** This is a research tool — silent degradation is worse than a clear error.
+
+- **PDF loading failure** (corrupted PDF, scanned-only images): Raise with a clear message suggesting alternative loaders. If in hybrid mode, fall back to chat-only extraction.
+- **Embedding API failure** (rate limit, network): Raise with retry suggestion. Do not silently skip RAG.
+- **Retriever returns no results**: The node proceeds but includes a note in its output that no relevant content was found. The formatter will flag these as missing parameters.
+- **LLM returns unparseable JSON** (formatter output): Retry once with a more explicit prompt. If still fails, return raw output with `status: "incomplete"`.
+- **Max iterations reached with incomplete status**: Save what was extracted, return with `status: "incomplete"` and `missing` list populated. Do not silently pretend it's complete.
+
+---
+
+## 10. Testing Strategy
+
+- **Unit tests**: Test each node independently with mock state dicts. No LLM calls needed — mock the LLM responses.
+- **Integration tests**: Test the full graph with a sample paper from `example/`. Requires API keys.
+- **RAG tests**: Test PDF loading + chunking + retrieval pipeline independently from the graph.
+- **Config tests**: Test that YAML + env var merging works, that missing required fields raise clear errors.
+
+---
+
+## 11. Dependencies
 
 ```
 # Core
-langgraph>=0.2.0
+langgraph>=0.3.0
 langchain>=0.3.0
 langchain-core>=0.3.0
 langchain-community>=0.3.0
@@ -418,7 +462,7 @@ mypy>=1.0.0
 
 ---
 
-## 10. What Gets Deleted
+## 12. What Gets Deleted
 
 From the new `langgraph` branch, remove:
 - `baseline/` — entire directory (comparison retrievers)
@@ -430,3 +474,4 @@ From the new `langgraph` branch, remove:
 - `agents/base_retriever.py` — ag2 base retriever
 - `workflows/` — entire directory (ag2 orchestration)
 - Hardcoded assistant IDs, cluster paths, OpenAI-specific config
+- Hardcoded parameter validation lists (e.g., required genic/gadget fields in `base_retriever.py`) — **intentionally replaced** by RAG-driven validation where the formatter discovers required parameters from the target software's docs
