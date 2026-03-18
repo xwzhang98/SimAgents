@@ -9,8 +9,8 @@ llm:
 rag:
   pdf_loader: "unstructured"      # "unstructured" | "pymupdf" | "pypdf" | "docling"
   vector_store: "chroma"          # "chroma" | "faiss"
-  chunk_size: 1000
-  chunk_overlap: 200
+  chunk_size: 2000
+  chunk_overlap: 400
   embedding_provider: "openai"    # "openai" | "huggingface"
   embedding_model: "text-embedding-3-small"
 

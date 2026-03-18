@@ -42,15 +42,24 @@ def physics_expert(state: ExtractionState, config: RunnableConfig) -> dict:
     system_prompt = _load_prompt(target_software, input_context, state.get("custom_prompt"))
     user_msg_parts = ["Please extract the simulation parameters from the provided source."]
     if paper_retriever and state.get("input_mode") in ("paper", "hybrid"):
-        search_queries = ["cosmological parameters simulation", "box size resolution particle number", "initial conditions redshift"]
+        search_queries = [
+            "cosmological parameters Omega matter dark energy baryon",
+            "Hubble parameter h sigma8 spectral index",
+            "simulation box size Mpc resolution particle number Ngrid",
+            "initial conditions redshift power spectrum transfer function",
+            "simulation setup configuration parameters table",
+        ]
         missing = state.get("missing_parameters", [])
         if missing:
             search_queries.append(" ".join(missing))
         retrieved_chunks = []
+        seen = set()
         for query in search_queries:
             docs = paper_retriever.invoke(query)
             for doc in docs:
-                retrieved_chunks.append(doc.page_content)
+                if doc.page_content not in seen:
+                    seen.add(doc.page_content)
+                    retrieved_chunks.append(doc.page_content)
         if retrieved_chunks:
             context = "\n---\n".join(retrieved_chunks)
             user_msg_parts.append(f"\n## Relevant sections from the paper:\n{context}")

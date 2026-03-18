@@ -15,9 +15,11 @@ export function connectSSE(
       console.error("Failed to parse SSE event:", e.data);
     }
   };
-  source.onerror = (e) => {
+  source.onerror = () => {
+    // SSE stream naturally closes after graph completes or hits interrupt().
+    // This is expected, not an error — call onClose instead of onError.
     source.close();
-    onError(e);
+    onClose();
   };
   return source;
 }

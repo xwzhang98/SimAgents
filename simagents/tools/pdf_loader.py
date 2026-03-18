@@ -69,4 +69,4 @@ def build_paper_retriever(paper_path: str, rag_settings: RAGSettings):
 
     embeddings = _get_embeddings(rag_settings)
     vector_store = _build_vector_store(chunks, embeddings, rag_settings.vector_store)
-    return vector_store.as_retriever()
+    return vector_store.as_retriever(search_kwargs={"k": 10})

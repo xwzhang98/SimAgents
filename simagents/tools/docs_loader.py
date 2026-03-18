@@ -16,4 +16,4 @@ def build_docs_retriever(target_software: str, rag_settings: RAGSettings, softwa
     chunks = splitter.split_documents(documents)
     embeddings = _get_embeddings(rag_settings)
     vector_store = _build_vector_store(chunks, embeddings, rag_settings.vector_store)
-    return vector_store.as_retriever()
+    return vector_store.as_retriever(search_kwargs={"k": 10})
