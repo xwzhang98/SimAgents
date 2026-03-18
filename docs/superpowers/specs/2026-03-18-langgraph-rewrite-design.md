@@ -26,7 +26,6 @@ SimAgents/
 │   ├── nodes/
 │   │   ├── __init__.py
 │   │   ├── parse_input.py        # Detect input mode (paper/chat/hybrid)
-│   │   ├── load_sources.py       # Build RAG indexes for paper + software docs
 │   │   ├── physics_expert.py     # Extract parameters from paper/user input
 │   │   ├── formatter.py          # Validate & format against target software docs
 │   │   ├── check_done.py         # Routing logic: done / loop / needs_user_input
@@ -245,16 +244,20 @@ class ExtractionState(TypedDict):
     messages: Annotated[list[BaseMessage], add_messages]  # Auto-accumulates across iterations
 ```
 
-**Note on RAG resources:** Retrievers (`VectorStoreRetriever`) are **not** stored in state — they are not serializable, and LangGraph requires serializable state for checkpointing (needed by `interrupt()`). Instead, retrievers are passed via LangGraph's `configurable` dict at graph invocation time:
+**Note on RAG resources:** Retrievers (`VectorStoreRetriever`) are **not** stored in state — they are not serializable, and LangGraph requires serializable state for checkpointing (needed by `interrupt()`). Instead, retrievers are built **before** graph invocation and passed via LangGraph's `configurable` dict:
 
 ```python
+# In create_extraction_graph() or the CLI entry point:
+paper_retriever = build_paper_retriever(paper_path, config)  # returns VectorStoreRetriever
+docs_retriever = build_docs_retriever(target_software, config)  # returns VectorStoreRetriever
+
 graph.invoke(
     {"paper_path": "paper.pdf", "target_software": "mp-gadget"},
-    config={"configurable": {"paper_retriever": retriever, "docs_retriever": docs_retriever}}
+    config={"configurable": {"paper_retriever": paper_retriever, "docs_retriever": docs_retriever}}
 )
 ```
 
-Nodes access retrievers via `config` parameter, not state. The `load_sources` node builds the retrievers and stores them in the config for downstream nodes.
+Nodes access retrievers via `config` parameter, not state. This means the `load_sources` node is a **pre-graph setup step**, not a graph node — it runs before `graph.invoke()`. The graph itself starts at `parse_input`.
 
 ### Checkpointer
 
@@ -269,12 +272,10 @@ graph = create_extraction_graph(config, checkpointer=MemorySaver())
 ### Graph topology
 
 ```
-              ┌───────────────┐
-              │  parse_input   │  detect mode: paper/chat/hybrid
-              └──────┬────────┘
+    [Pre-graph: build_paper_retriever + build_docs_retriever → passed via configurable]
                      │
               ┌──────▼────────┐
-              │  load_sources  │  build RAG indexes (paper + software docs)
+              │  parse_input   │  detect mode: paper/chat/hybrid
               └──────┬────────┘
                      │
               ┌──────▼────────┐
@@ -305,7 +306,6 @@ graph = create_extraction_graph(config, checkpointer=MemorySaver())
 ### Node behavior
 
 - **`parse_input`** — detects input mode from presence of `paper_path` and/or `user_parameters`
-- **`load_sources`** — builds FAISS/Chroma indexes for paper (if provided) and target software docs. Indexes built once, reused across iterations.
 - **`physics_expert`** — loads prompt from `prompts/physics_expert.md`, injects `target_software` and `custom_prompt`, uses `paper_retriever` tool. On subsequent iterations, includes `missing_parameters` and prior `messages` for context. Writes `raw_parameters`.
 - **`formatter`** — loads prompt from `prompts/formatter.md`, uses `docs_retriever` tool to look up parameter requirements for target software. Validates `raw_parameters`, outputs structured JSON. Writes `formatted_parameters`, `status`, `missing_parameters`.
 - **`check_done`** — pure logic, no LLM. Returns `"done"` if status is complete or max iterations reached. Returns `"needs_user_input"` if required params are missing and can't be found. Returns `"loop"` otherwise.
@@ -342,12 +342,12 @@ The extraction graph is built via a factory function:
 ```python
 # Standalone usage:
 from simagents import create_extraction_graph
-graph = create_extraction_graph(config)
+graph = create_extraction_graph(config, checkpointer=MemorySaver())
 result = graph.invoke({"paper_path": "paper.pdf", "target_software": "mp-gadget"})
 
 # As subgraph in a larger system (e.g., Denario):
 from simagents import create_extraction_graph
-parent_graph.add_node("parameter_extraction", create_extraction_graph(config))
+parent_graph.add_node("parameter_extraction", create_extraction_graph(config, checkpointer=MemorySaver()))
 ```
 
 ### Design principles for extensibility
@@ -449,6 +449,7 @@ scipy>=1.9.0
 # faiss-cpu>=1.7.0
 
 # Optional visualization
+# langchain-experimental>=0.3.0  # PythonREPL for code execution
 # gaepsi2
 # bigfile
 
