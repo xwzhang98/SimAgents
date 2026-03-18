@@ -27,3 +27,5 @@ app.include_router(upload.router)
 from simagents.api.routes import settings_routes, parameters
 app.include_router(settings_routes.router)
 app.include_router(parameters.router)
+from simagents.api.routes import extract
+app.include_router(extract.router)
