@@ -1,44 +1,48 @@
-# Core
-langgraph>=0.3.0
-langchain>=0.3.0
-langchain-core>=0.3.0
-langchain-community>=0.3.0
+# SimAgents — Full dependencies
+# Install: pip install -r requirements.txt
+# Then run: ./start.sh
+
+# Core orchestration
+langgraph>=1.1.0
+langchain>=1.2.0
+langchain-core>=1.2.0
+langchain-community>=0.4.0
+langchain-text-splitters>=1.1.0
 
 # RAG
-langchain-chroma>=0.2.0
+langchain-chroma>=1.1.0
+chromadb>=1.5.0
 
 # Config
-pydantic>=2.0.0
-pydantic-settings>=2.0.0
+pydantic>=2.12.0
+pydantic-settings>=2.13.0
 pyyaml>=6.0
-python-dotenv>=1.0.0
+python-dotenv>=1.2.0
 
 # Scientific
-numpy>=1.21.0
-matplotlib>=3.5.0
-scipy>=1.9.0
+numpy>=2.0.0
+matplotlib>=3.10.0
+scipy>=1.17.0
 
-# LLM providers (install the one you need)
-# langchain-openai>=0.2.0
-# langchain-anthropic>=0.2.0
+# GUI backend
+fastapi>=0.135.0
+uvicorn>=0.42.0
+python-multipart>=0.0.22
+sse-starlette>=3.3.0
+
+# Default LLM provider (at least one required)
+langchain-openai>=1.1.0
+# Uncomment additional providers as needed:
+# langchain-anthropic>=0.3.0
 # langchain-google-genai>=2.0.0
 # langchain-ollama>=0.2.0
 
-# Optional PDF loaders
+# Optional: better PDF parsing (heavy dependency, requires system packages)
 # unstructured>=0.10.0
 # pymupdf>=1.24.0
-# docling>=2.0.0
-
-# Optional vector stores
-# faiss-cpu>=1.7.0
-
-# Optional visualization
-# langchain-experimental>=0.3.0
-# gaepsi2
-# bigfile
 
 # Dev
-pytest>=7.0.0
-pytest-cov>=4.0.0
-ruff>=0.1.0
-mypy>=1.0.0
+pytest>=9.0.0
+pytest-cov>=7.0.0
+ruff>=0.15.0
+mypy>=1.19.0

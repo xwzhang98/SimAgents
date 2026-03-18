@@ -209,15 +209,25 @@ simagents/
 
 ## GUI
 
-### Running the GUI
+### Quick Start (one command)
 
 ```bash
-# Terminal 1: Start the backend
+conda activate langgraph
+pip install -r requirements.txt
+./start.sh
+```
+
+This starts both backend and frontend, and opens the browser automatically.
+
+### Manual Start (two terminals)
+
+```bash
+# Terminal 1: Backend
 conda activate langgraph
 pip install -e ".[gui]"
 uvicorn simagents.api.server:app --port 8000 --reload
 
-# Terminal 2: Start the frontend
+# Terminal 2: Frontend
 cd frontend
 npm install
 npm run dev
