@@ -1,5 +1,6 @@
 """Extraction routes — start, stream, respond."""
 from __future__ import annotations
+import asyncio
 import json
 import os
 from pathlib import Path
@@ -7,14 +8,10 @@ from typing import AsyncGenerator
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from sse_starlette.sse import EventSourceResponse
-from langchain.chat_models import init_chat_model
-from langgraph.checkpoint.memory import MemorySaver
 from simagents.api.session import session_manager
 from simagents.api.routes.upload import get_upload_path
 from simagents.config.settings import Settings
 from simagents.graph.parameter_extraction import create_extraction_graph
-from simagents.tools.pdf_loader import build_paper_retriever
-from simagents.tools.docs_loader import build_docs_retriever
 
 router = APIRouter()
 CONFIG_PATH = os.environ.get("SIMAGENTS_CONFIG", str(Path(__file__).resolve().parents[3] / "config.yaml"))
@@ -29,9 +26,46 @@ class ExtractRequest(BaseModel):
 
 @router.post("/api/extract")
 async def start_extraction(req: ExtractRequest):
+    """Return session_id immediately. Heavy work (retrievers, LLM) deferred to stream."""
     settings = Settings.from_yaml(CONFIG_PATH)
     target = req.target_software or settings.extraction.target_software
 
+    file_path = None
+    if req.file_id:
+        file_path_obj = get_upload_path(req.file_id)
+        if not file_path_obj:
+            raise HTTPException(status_code=404, detail="Uploaded file not found")
+        file_path = str(file_path_obj)
+
+    # Create a lightweight session — no LLM or retriever building yet
+    session_id = session_manager.create_session(graph=None, config={}, file_path=file_path)
+    session = session_manager.get_session(session_id)
+    session.status = "running"
+
+    # Store request params for deferred setup in _stream_events
+    session._extract_request = {
+        "file_path": file_path,
+        "target_software": target,
+        "custom_prompt": req.custom_prompt,
+        "user_parameters": req.user_parameters,
+        "settings": settings,
+    }
+
+    return {"session_id": session_id}
+
+
+def _build_graph_and_config(session):
+    """Build LLM, retrievers, and graph. Called from stream (blocking is OK there)."""
+    from langchain.chat_models import init_chat_model
+    from langgraph.checkpoint.memory import MemorySaver
+    from simagents.tools.pdf_loader import build_paper_retriever
+    from simagents.tools.docs_loader import build_docs_retriever
+
+    req = session._extract_request
+    settings = req["settings"]
+    target = req["target_software"]
+
+    # Build LLM
     llm_kwargs = {"temperature": settings.llm.temperature}
     if settings.llm.provider == "openai" and settings.openai_api_key:
         llm_kwargs["api_key"] = settings.openai_api_key
@@ -42,19 +76,18 @@ async def start_extraction(req: ExtractRequest):
 
     llm = init_chat_model(model=settings.llm.model, model_provider=settings.llm.provider, **llm_kwargs)
 
+    # Build retrievers
     paper_retriever = None
-    file_path = None
-    if req.file_id:
-        file_path_obj = get_upload_path(req.file_id)
-        if not file_path_obj:
-            raise HTTPException(status_code=404, detail="Uploaded file not found")
-        file_path = str(file_path_obj)
-        paper_retriever = build_paper_retriever(file_path, settings.rag)
+    if req["file_path"]:
+        paper_retriever = build_paper_retriever(req["file_path"], settings.rag)
 
     docs_retriever = build_docs_retriever(target, settings.rag, settings.paths.software_docs_dir)
+
+    # Build graph
     graph = create_extraction_graph(settings, checkpointer=MemorySaver())
 
-    config = {
+    session.graph = graph
+    session.config = {
         "configurable": {
             "llm": llm,
             "paper_retriever": paper_retriever,
@@ -63,15 +96,11 @@ async def start_extraction(req: ExtractRequest):
             "thread_id": "gui-session",
         }
     }
-
-    session_id = session_manager.create_session(graph=graph, config=config, file_path=file_path)
-    session = session_manager.get_session(session_id)
-    session.status = "running"
     session._initial_state = {
-        "paper_path": file_path,
-        "user_parameters": req.user_parameters,
+        "paper_path": req["file_path"],
+        "user_parameters": req["user_parameters"],
         "target_software": target,
-        "custom_prompt": req.custom_prompt,
+        "custom_prompt": req["custom_prompt"],
         "max_iterations": settings.extraction.max_iterations,
         "input_mode": "",
         "raw_parameters": "",
@@ -84,13 +113,18 @@ async def start_extraction(req: ExtractRequest):
         "messages": [],
     }
 
-    return {"session_id": session_id}
-
 
 async def _stream_events(session) -> AsyncGenerator[dict, None]:
     """Stream LangGraph execution as SSE events."""
     try:
-        if session._resume_value is not None:
+        # Deferred setup: build retrievers and graph (heavy, blocking)
+        if not session.graph:
+            yield {"event": "message", "data": json.dumps({"type": "status", "message": "Loading paper and building indexes..."})}
+            await asyncio.to_thread(_build_graph_and_config, session)
+            yield {"event": "message", "data": json.dumps({"type": "status", "message": "Starting extraction..."})}
+
+        # Determine if this is a resume or initial run
+        if hasattr(session, "_resume_value") and session._resume_value is not None:
             from langgraph.types import Command
             input_val = Command(resume=session._resume_value)
             session._resume_value = None
