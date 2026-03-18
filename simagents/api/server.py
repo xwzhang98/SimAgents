@@ -1,9 +1,15 @@
 """FastAPI application for SimAgents GUI."""
 from __future__ import annotations
+from pathlib import Path
 from contextlib import asynccontextmanager
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from simagents.api.session import session_manager
+
+# Load .env from project root (ensures API keys are available)
+_project_root = Path(__file__).resolve().parents[2]
+load_dotenv(_project_root / ".env")
 
 
 @asynccontextmanager
