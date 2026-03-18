@@ -72,3 +72,14 @@ class Settings(BaseSettings):
         with open(yaml_path, "r") as f:
             data = yaml.safe_load(f) or {}
         return cls(**data)
+
+    def to_yaml(self, yaml_path: str | Path) -> None:
+        """Write settings to a YAML file (excludes API keys)."""
+        yaml_path = Path(yaml_path)
+        data = {}
+        for field_name in ["llm", "rag", "extraction", "paths", "slurm"]:
+            value = getattr(self, field_name)
+            if value is not None:
+                data[field_name] = value.model_dump()
+        with open(yaml_path, "w") as f:
+            yaml.dump(data, f, default_flow_style=False, sort_keys=False)

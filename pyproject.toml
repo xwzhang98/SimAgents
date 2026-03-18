@@ -29,6 +29,7 @@ anthropic = ["langchain-anthropic>=0.2.0"]
 google = ["langchain-google-genai>=2.0.0"]
 ollama = ["langchain-ollama>=0.2.0"]
 dev = ["pytest>=7.0.0", "pytest-cov>=4.0.0", "ruff>=0.1.0", "mypy>=1.0.0"]
+gui = ["fastapi>=0.104.0", "uvicorn>=0.24.0", "python-multipart>=0.0.6", "sse-starlette>=1.6.0"]
 
 [tool.setuptools.packages.find]
 include = ["simagents*"]

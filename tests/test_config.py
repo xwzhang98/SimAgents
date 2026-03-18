@@ -57,3 +57,17 @@ def test_settings_missing_yaml_uses_defaults():
 def test_llm_settings_validation():
     with pytest.raises(ValueError):
         LLMSettings(provider="openai", model="gpt-4o", temperature=3.0)
+
+
+def test_settings_to_yaml(tmp_path):
+    settings = Settings()
+    settings.llm.provider = "anthropic"
+    settings.llm.model = "claude-sonnet-4-20250514"
+    yaml_path = tmp_path / "config.yaml"
+    settings.to_yaml(str(yaml_path))
+    loaded = Settings.from_yaml(str(yaml_path))
+    assert loaded.llm.provider == "anthropic"
+    assert loaded.llm.model == "claude-sonnet-4-20250514"
+    content = yaml_path.read_text()
+    assert "openai_api_key" not in content
+    assert "anthropic_api_key" not in content
