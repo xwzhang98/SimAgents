@@ -59,6 +59,14 @@ def build_paper_retriever(paper_path: str, rag_settings: RAGSettings):
         raise RuntimeError(f"Failed to load PDF with '{rag_settings.pdf_loader}' loader: {e}. Try a different loader via config.yaml (rag.pdf_loader).") from e
     splitter = _get_text_splitter(rag_settings)
     chunks = splitter.split_documents(documents)
+
+    # Filter complex metadata that Chroma can't handle (e.g., dicts from unstructured)
+    for chunk in chunks:
+        chunk.metadata = {
+            k: v for k, v in chunk.metadata.items()
+            if isinstance(v, (str, int, float, bool)) or v is None
+        }
+
     embeddings = _get_embeddings(rag_settings)
     vector_store = _build_vector_store(chunks, embeddings, rag_settings.vector_store)
     return vector_store.as_retriever()
