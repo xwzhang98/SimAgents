@@ -28,7 +28,7 @@ fi
 
 # Start backend
 echo "Starting backend on http://localhost:8000..."
-uvicorn simagents.api.server:app --port 8000 --reload &
+uvicorn simagents.api.server:app --host 0.0.0.0 --port 8000 --reload &
 BACKEND_PID=$!
 
 # Start frontend
