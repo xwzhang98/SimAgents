@@ -207,6 +207,24 @@ simagents/
   utils/          File helpers, SLURM utils
 ```
 
+## GUI
+
+### Running the GUI
+
+```bash
+# Terminal 1: Start the backend
+conda activate langgraph
+pip install -e ".[gui]"
+uvicorn simagents.api.server:app --port 8000 --reload
+
+# Terminal 2: Start the frontend
+cd frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:3000 in your browser.
+
 ## Citation
 
 If you use SimAgents in your research, please cite:
