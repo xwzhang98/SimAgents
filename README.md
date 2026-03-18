@@ -1,291 +1,221 @@
 # SimAgents
 
-A powerful AI-driven framework for automating cosmological simulation workflows. SimAgents combines multiple specialized AI agents to extract simulation parameters from scientific papers, generate visualizations, and create 3D density field plots from MP-Gadget simulation data.
+A model-agnostic multi-agent framework for automating cosmological simulation workflows. SimAgents extracts simulation parameters from scientific papers, validates them against software documentation, and generates ready-to-run configuration files.
 
-## 🚀 Features
+Built with [LangGraph](https://github.com/langchain-ai/langgraph) for orchestration and [LangChain](https://github.com/langchain-ai/langchain) for RAG and LLM abstraction.
 
-### Core Capabilities
+## Features
 
-- **📄 Parameter Extraction**: Automatically extract MP-Gadget simulation parameters from scientific papers using AI-powered document analysis
-- **📊 Power Spectrum Visualization**: Generate publication-quality power spectrum plots from simulation outputs
-- **🎨 3D Density Field Visualization**: Create stunning 3D density field visualizations using gaepsi2 integration
-- **🤖 AI Code Generation**: Automatic Python code generation and execution with error handling
-- **🔧 Workflow Automation**: End-to-end automation of complex simulation analysis tasks
+- **Parameter Extraction**: Extract simulation parameters from PDF papers using RAG-powered multi-agent workflow
+- **Model Agnostic**: Use any LLM provider — OpenAI, Anthropic Claude, Google Gemini, or local models via Ollama
+- **Multi-Software Support**: Target different simulation software (MP-Gadget, Arepo, Gadget-4, Enzo) by adding docs
+- **Human-in-the-Loop**: When parameters are missing, the system asks you instead of guessing
+- **Composable**: Use as a CLI tool or import as a Python library / LangGraph subgraph
+- **Visualization**: Standalone power spectrum and density field plotters
 
-### Agent Architecture
+## Architecture
 
-- **VisualizationAgent**: Specialized in creating scientific plots and power spectrum visualizations
-- **DensityFieldAgent**: Expert in 3D density field visualization with RAG-enhanced code generation
-- **ParameterRetriever**: Extracts simulation parameters from scientific literature
-- **CodeExecutor**: Safe execution environment for AI-generated code with automatic error handling
+```
+[Paper PDF / User Input]
+         |
+    parse_input          ← detect paper/chat/hybrid mode
+         |
+    physics_expert       ← RAG search paper → extract parameters
+         |
+    formatter            ← RAG search software docs → validate & format
+         |
+    check_done           ← complete? loop? ask user?
+    /    |    \
+loop  ask_user  done
+         |       |
+    [interrupt]  save_output → genic.json + gadget.json
+```
 
-## 📦 Installation
+## Installation
 
 ### Prerequisites
 
-- Python 3.8+
-- OpenAI API key
+- Python 3.11+
+- An API key for your chosen LLM provider
 
 ### Setup
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd SimAgents
-   ```
+```bash
+git clone https://github.com/xwzhang98/SimAgents.git
+cd SimAgents
+git checkout feature/langgraph-rewrite
 
-2. **Create and activate virtual environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\\Scripts\\activate
-   ```
+# Create environment (conda recommended)
+conda create -n langgraph python=3.11 -y
+conda activate langgraph
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+# Install with your preferred LLM provider
+pip install -e ".[dev,openai]"        # For OpenAI GPT models
+pip install -e ".[dev,anthropic]"     # For Anthropic Claude
+pip install -e ".[dev,google]"        # For Google Gemini
+pip install -e ".[dev,ollama]"        # For local models via Ollama
 
-4. **Configure API key**
-   
-   Create a `.env` file in the root directory:
-   ```env
-   OPENAI_API_KEY="your-openai-api-key-here"
-   ```
-   Note: We have provided an API key that has limited credits in our codes. Please use that key if you want to test out some important features in our tool.
+# Optional: better PDF parsing (heavy dependency)
+pip install -e ".[unstructured]"
+```
 
-### Optional Dependencies
-
-For 3D density field visualization, uncomment and install the optional packages in `requirements.txt`:
+### Configuration
 
 ```bash
-# For gaepsi2 support (may require manual compilation)
-pip install Cython>=3.0.0
-pip install gaepsi2
-pip install bigfile
+# Copy templates
+cp config.example.yaml config.yaml
+cp .env.example .env
+
+# Edit .env with your API key
+echo 'OPENAI_API_KEY=sk-...' > .env
 ```
 
-**Note**: gaepsi2 may have compilation issues on some systems. See installation tips in `requirements.txt`.
+Edit `config.yaml` to set your provider and model:
 
-## 🎯 Quick Start
+```yaml
+llm:
+  provider: "openai"          # or "anthropic", "google", "ollama"
+  model: "gpt-4o"             # or "claude-sonnet-4-20250514", "gemini-pro", etc.
+  temperature: 0.01
 
-### Parameter Extraction
+rag:
+  pdf_loader: "pypdf"         # or "unstructured" (better but heavier)
+  vector_store: "chroma"
+```
 
-Extract simulation parameters from scientific papers:
+## Usage
+
+### CLI
+
+```bash
+# Extract parameters from a paper
+python main.py --paper path/to/paper.pdf
+
+# Target different simulation software
+python main.py --paper paper.pdf --software arepo
+
+# Custom output directory
+python main.py --paper paper.pdf --output ./results
+
+# Add custom instructions
+python main.py --paper paper.pdf --prompt "Extract parameters for the low-resolution run"
+```
+
+### Python Library
 
 ```python
-#!/usr/bin/env python3
-import os
-from pathlib import Path
-from dotenv import load_dotenv
-from workflows.parameter_extraction import ParameterExtractionWorkflow
+from simagents import create_extraction_graph
+from simagents.config import Settings
+from simagents.tools import build_paper_retriever, build_docs_retriever
+from langchain.chat_models import init_chat_model
+from langgraph.checkpoint.memory import MemorySaver
 
-# Load environment variables
-load_dotenv()
+settings = Settings.from_yaml("config.yaml")
+llm = init_chat_model("gpt-4o", model_provider="openai")
 
-def main():
-    # Path to your PDF paper
-    paper_path = "path/to/your/paper.pdf"
-    
-    # Output directory for extracted parameters
-    output_dir = "parameter_output"
-    
-    # Create workflow with custom extraction prompt
-    workflow = ParameterExtractionWorkflow(
-        paper_path=paper_path,
-        output_dir=output_dir,
-        max_iterations=2,
-        custom_prompt="Extract parameters for the simulation run with name XXXXX"
-    )
-    
-    # Run extraction
-    file_paths = workflow.run()
-    
-    print("✅ Extraction completed!")
-    for file_type, file_path in file_paths.items():
-        print(f"📄 {file_type.capitalize()}: {file_path}")
+paper_retriever = build_paper_retriever("paper.pdf", settings.rag)
+docs_retriever = build_docs_retriever("mp-gadget", settings.rag)
 
-if __name__ == "__main__":
-    main()
+graph = create_extraction_graph(settings, checkpointer=MemorySaver())
+result = graph.invoke(
+    {
+        "paper_path": "paper.pdf",
+        "target_software": "mp-gadget",
+        "custom_prompt": None,
+        "user_parameters": None,
+        "max_iterations": 2,
+        "input_mode": "", "raw_parameters": "", "formatted_parameters": {},
+        "status": "", "missing_parameters": [], "user_questions": [],
+        "user_answers": [], "iteration": 0, "messages": [],
+    },
+    config={
+        "configurable": {
+            "llm": llm,
+            "paper_retriever": paper_retriever,
+            "docs_retriever": docs_retriever,
+            "output_dir": "./output",
+            "thread_id": "my-session",
+        }
+    },
+)
 ```
 
-### Complete Visualization Workflow
-
-Run both power spectrum and density field visualization:
+### As a Subgraph (e.g., inside Denario)
 
 ```python
-#!/usr/bin/env python3
-from pathlib import Path
-from dotenv import load_dotenv
+from simagents import create_extraction_graph
 
-# Load environment variables
-load_dotenv()
-
-def main():
-    """Run complete visualization workflow."""
-    
-    # Setup paths
-    simulation_output_dir = Path("path/to/simulation/output")
-    visualization_output_dir = Path("visualization_output")
-    demo_file = Path("data/gaepsi2_demo.py")
-    
-    # Create output directory
-    visualization_output_dir.mkdir(exist_ok=True)
-    
-    # Import agents
-    from agents.visualization_agent import VisualizationAgent
-    from agents.density_field_agent import DensityFieldAgent
-    
-    # Step 1: Power Spectrum Visualization
-    print("🎨 Creating power spectrum plots...")
-    viz_agent = VisualizationAgent()
-    
-    result = viz_agent.generate_and_execute_plot(
-        output_dir=str(simulation_output_dir),
-        output_filename=str(visualization_output_dir / "power_spectrum.png")
-    )
-    
-    # Step 2: Density Field Visualization (optional - requires gaepsi2)
-    print("🎨 Creating density field visualization...")
-    try:
-        density_agent = DensityFieldAgent(gaepsi2_demo_path=str(demo_file))
-        
-        result = density_agent.generate_and_execute_density_field(
-            simulation_output_dir=str(simulation_output_dir),
-            output_dir=str(visualization_output_dir),
-            snapshot_name="PART_000",
-            particle_type=1
-        )
-        
-        density_agent.cleanup()
-        print("✅ Complete workflow finished!")
-        
-    except Exception as e:
-        print(f"⚠️ Density field visualization skipped: {e}")
-        print("💡 Install gaepsi2 dependencies for full functionality")
-
-if __name__ == "__main__":
-    main()
+parent_graph.add_node("parameter_extraction", create_extraction_graph(config, checkpointer=...))
 ```
 
-## 🔧 Configuration
+## Output
 
-### Environment Variables
+The system produces two JSON files per extraction:
 
-Configure SimAgents through environment variables in `.env`:
-
-```env
-# Required
-OPENAI_API_KEY="your-openai-api-key"
-```
-Note: We have provided an API key that has limited credits in our codes. Please use that key if you want to test out some important features in our tool.
-
-### LLM Settings
-
-Default settings provide reproducible results:
-
-- **Model**: gpt-4o
-- **Temperature**: 0.01 (for reproducibility)
-- **Top-p**: 0.1
-
-We also provide support for the Qwen3-family models.
-- **Model**: Qwen3-4B, Qwen3-8B, Qwen3-14B
-- **Temperature**: 0.01 (for reproducibility)
-- **Top-p**: 0.1
-
-## 📊 Supported Data Formats
-
-### Input Formats
-
-- **PDF Papers**: Scientific papers for parameter extraction
-- **MP-Gadget Output**: BigFile format simulation data
-- **Power Spectrum Files**: `powerspectrum-{scale_factor}.txt`
-- **Snapshot Files**: `Snapshots.txt` with scale factor listings
-
-### Output Formats
-
-- **Parameter Files**: JSON format with genic/gadget configurations
-- **Visualizations**: High-resolution PNG plots
-- **Generated Code**: Self-contained Python scripts
-
-## 🎨 Example Outputs
-
-### Parameter Extraction
+**`<paper>_genic.json`** — Initial conditions parameters:
 ```json
-"genic": {
-      "OutputDir": "./ICs/",
-      "FileBase": "LR_100Mpc_64",
-      "BoxSize": 100000.0,
-      "Ngrid": 64,
-      "WhichSpectrum": 2,
-      "FileWithInputSpectrum": "./WMAP9_CAMB_matterpower.dat",
-      "Omega0": 0.2814,
-      "OmegaBaryon": 0.0464,
-      "OmegaLambda": 0.7186,
-      "HubbleParam": 0.697,
-      "ProduceGas": 0,
-      "Redshift": 99,
-      "Seed": 12345
-    }
-
-"gadget": {
-      "InitCondFile": "./ICs/LR_100Mpc_64",
-      "OutputDir": "./output/",
-      "OutputList": "0.333,1.0",
-      "TimeLimitCPU": 86400,
-      "MetalReturnOn": 0,
-      "CoolingOn": 0,
-      "SnapshotWithFOF": 0,
-      "BlackHoleOn": 0,
-      "StarformationOn": 0,
-      "WindOn": 0,
-      "MassiveNuLinRespOn": 0,
-      "DensityIndependentSphOn": 0,
-      "Omega0": 0.2814
-    }
+{
+  "source": "path/to/paper.pdf",
+  "parameters": {
+    "BoxSize": 100000,
+    "Ngrid": 64,
+    "Omega0": 0.2814,
+    "OmegaLambda": 0.7186,
+    "HubbleParam": 0.697,
+    "Redshift": 99
+  }
 }
 ```
 
-### Generated Visualizations
+**`<paper>_gadget.json`** — Runtime simulation parameters.
 
-- **Power Spectrum Plots**: Log-log scale P(k) vs k with redshift labels
-- **Density Field Visualizations**: 3D rendered density fields from particle data
+## Adding New Simulation Software
 
-## 🔍 Golden Standard Database
+Add a docs folder with markdown reference files:
 
-SimAgents includes a comprehensive database of validated simulation parameters from major cosmological surveys:
-
-- **IllustrisTNG**: TNG100, TNG300 series
-- **Millennium**: Large-scale structure simulations  
-- **MTNG**: MillenniumTNG simulations
-- **Magneticum**: Galaxy formation simulations
-- **SIMBA**: Hydrodynamical simulations
-
-## 🛠️ Development
-
-### Testing
-
-Run the test workflows to verify functionality:
-
-```bash
-# Test parameter extraction
-python workflows/run_example_extraction.py
-
-# Test visualization
-python workflows/visualization_workflow.py
-
-# Test complete workflow
-python workflows/complete_visualization_workflow.py
+```
+data/software_docs/
+  my-software/
+    parameter_reference.md
+    other_docs.md
 ```
 
+Then run with `--software my-software`.
 
-## 🙏 Acknowledgments
+## Golden Standard Database
 
-- **AutoGen**: Multi-agent conversation framework
-- **OpenAI**: GPT models for AI capabilities
-- **MP-Gadget**: Cosmological simulation code
-- **gaepsi2**: 3D visualization library
-- **BigFile**: Efficient data storage format
+Includes validated parameter configurations from major simulations for benchmarking:
+IllustrisTNG, Millennium, MTNG, Magneticum, ASTRID, BlueTides, and more.
 
----
+## Testing
 
-**Note**: This framework is designed for research purposes in computational cosmology. Ensure proper validation of extracted parameters before use in production simulations.
+```bash
+conda activate langgraph
+pytest tests/ -v
+```
+
+## Project Structure
+
+```
+simagents/
+  config/         Settings (YAML + env vars)
+  tools/          PDF loader, docs loader (RAG)
+  prompts/        Externalized prompt templates
+  nodes/          LangGraph node functions
+  graph/          StateGraph construction
+  visualization/  Standalone plotters
+  utils/          File helpers, SLURM utils
+```
+
+## Citation
+
+If you use SimAgents in your research, please cite:
+
+> Zhang et al., "SimAgents: A Multi-Agent Framework for Cosmological Simulation Automation", IJCNLP 2025 Demo. [ACL Anthology](https://aclanthology.org/2025.ijcnlp-demo.7/)
+
+## Acknowledgments
+
+- [LangGraph](https://github.com/langchain-ai/langgraph) — Multi-agent orchestration
+- [LangChain](https://github.com/langchain-ai/langchain) — LLM abstraction and RAG
+- [MP-Gadget](https://github.com/MP-Gadget/MP-Gadget) — Cosmological simulation code
+- [gaepsi2](https://github.com/rainwoodman/gaepsi2) — 3D visualization
