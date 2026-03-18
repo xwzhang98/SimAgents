@@ -1,0 +1,29 @@
+# SimAgents Configuration
+# Copy this file to config.yaml and edit as needed.
+
+llm:
+  provider: "openai"              # "openai" | "anthropic" | "google" | "ollama"
+  model: "gpt-4o"                 # Model name for your provider
+  temperature: 0.01               # Low temperature for reproducibility
+
+rag:
+  pdf_loader: "unstructured"      # "unstructured" | "pymupdf" | "pypdf" | "docling"
+  vector_store: "chroma"          # "chroma" | "faiss"
+  chunk_size: 1000
+  chunk_overlap: 200
+  embedding_provider: "openai"    # "openai" | "huggingface"
+  embedding_model: "text-embedding-3-small"
+
+extraction:
+  max_iterations: 2
+  target_software: "mp-gadget"    # "mp-gadget" | "arepo" | "gadget-4" | "enzo"
+
+paths:
+  output_dir: "./output"
+  software_docs_dir: "./data/software_docs"
+
+# Optional: SLURM settings for HPC users
+# slurm:
+#   partition: "RM"
+#   nodes: 1
+#   time: "16:00:00"
