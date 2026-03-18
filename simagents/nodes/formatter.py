@@ -4,6 +4,7 @@ import json
 import re
 from pathlib import Path
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.runnables import RunnableConfig
 from simagents.graph.state import ExtractionState
 
 _PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "formatter.md"
@@ -34,7 +35,7 @@ def _extract_json(text: str) -> dict:
     raise ValueError(f"Could not extract JSON from response: {text[:200]}...")
 
 
-def formatter(state: ExtractionState, config: dict) -> dict:
+def formatter(state: ExtractionState, config: RunnableConfig) -> dict:
     configurable = config.get("configurable", {})
     llm = configurable["llm"]
     docs_retriever = configurable["docs_retriever"]

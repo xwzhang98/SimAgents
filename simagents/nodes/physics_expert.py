@@ -2,6 +2,7 @@
 from __future__ import annotations
 from pathlib import Path
 from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.runnables import RunnableConfig
 from simagents.graph.state import ExtractionState
 
 _PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "physics_expert.md"
@@ -32,7 +33,7 @@ def _build_input_context(state: ExtractionState) -> str:
     return "\n".join(parts)
 
 
-def physics_expert(state: ExtractionState, config: dict) -> dict:
+def physics_expert(state: ExtractionState, config: RunnableConfig) -> dict:
     configurable = config.get("configurable", {})
     llm = configurable["llm"]
     paper_retriever = configurable.get("paper_retriever")

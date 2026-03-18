@@ -2,10 +2,11 @@
 from __future__ import annotations
 import json
 from pathlib import Path
+from langchain_core.runnables import RunnableConfig
 from simagents.graph.state import ExtractionState
 
 
-def save_output(state: ExtractionState, config: dict) -> dict:
+def save_output(state: ExtractionState, config: RunnableConfig) -> dict:
     output_dir = Path(config.get("configurable", {}).get("output_dir", "./output"))
     output_dir.mkdir(parents=True, exist_ok=True)
     paper_path = state.get("paper_path")
