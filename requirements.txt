@@ -1,37 +1,44 @@
-# SimAgents Dependencies
+# Core
+langgraph>=0.3.0
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-community>=0.3.0
 
-# AutoGen framework for agent communication
-pyautogen>=0.2.0
+# RAG
+langchain-chroma>=0.2.0
 
-# OpenAI API client
-openai>=1.0.0
-
-# YAML processing
-PyYAML>=6.0
-
-# Environment variable loading
+# Config
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+pyyaml>=6.0
 python-dotenv>=1.0.0
 
-# Scientific computing and plotting
+# Scientific
 numpy>=1.21.0
 matplotlib>=3.5.0
 scipy>=1.9.0
 
-# Optional: For density field visualization (density_field_agent.py)
-# Note: gaepsi2 may have compilation issues on some systems
-# Uncomment and install manually if you plan to use DensityFieldAgent with gaepsi2
-# Cython>=3.0.0
+# LLM providers (install the one you need)
+# langchain-openai>=0.2.0
+# langchain-anthropic>=0.2.0
+# langchain-google-genai>=2.0.0
+# langchain-ollama>=0.2.0
+
+# Optional PDF loaders
+# unstructured>=0.10.0
+# pymupdf>=1.24.0
+# docling>=2.0.0
+
+# Optional vector stores
+# faiss-cpu>=1.7.0
+
+# Optional visualization
+# langchain-experimental>=0.3.0
 # gaepsi2
 # bigfile
-# 
-# Installation tips for gaepsi2:
-# - May require manual compilation on macOS/ARM systems
-# - Consider using conda: conda install -c conda-forge gaepsi2
-# - Alternative: Use Docker container with pre-built gaepsi2
 
-# Optional: For development and testing
+# Dev
 pytest>=7.0.0
 pytest-cov>=4.0.0
-black>=23.0.0
-flake8>=6.0.0
+ruff>=0.1.0
 mypy>=1.0.0
