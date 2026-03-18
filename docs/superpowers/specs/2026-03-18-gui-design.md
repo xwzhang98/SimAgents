@@ -33,6 +33,8 @@ Two processes:
 
 Local-first (single user, sessions in memory), but structured for future deployment.
 
+CORS: FastAPI middleware allows `http://localhost:3000` origin.
+
 ---
 
 ## 2. Layout
@@ -55,13 +57,13 @@ Three-panel layout with icon sidebar navigation:
 - Each parameter shown as a row: name (left) + value (right, monospace, green)
 - Missing parameters shown in red
 - Edit mode: clicking "Edit" makes values editable inline
-- Export button: downloads genic.json + gadget.json
+- Export button: downloads a ZIP containing genic.json + gadget.json (single download)
 - Status bar: colored dot (green=complete, orange=in-progress, red=missing) + "7/8 parameters found" + source filename
 
-### Settings Page
-- Replaces the center + right panels when settings icon is clicked
+### Settings View
+- Rendered as conditional content in `page.tsx` (NOT a separate Next.js route) — clicking the settings icon swaps the center+right panels for the settings form, clicking back or cancel restores chat+params
 - Sections: LLM (provider dropdown, model text, temperature slider), RAG (PDF loader, vector store, chunk size, embedding), Extraction (target software, max iterations), Paths (output dir)
-- Save button persists to `config.yaml` (shared with CLI)
+- Save button persists to `config.yaml` via `PUT /api/settings` (requires `Settings.to_yaml()` method — must be added to `settings.py`)
 - Cancel returns to chat view
 
 ---
@@ -77,8 +79,16 @@ Upload a PDF paper.
 ### `POST /api/extract`
 Start a parameter extraction.
 - Request: `{"file_id": "uuid" | null, "user_parameters": {} | null, "target_software": "mp-gadget", "custom_prompt": null}`
+- `target_software` in the request overrides the value from `config.yaml`. If omitted, uses `settings.extraction.target_software`.
 - Response: `{"session_id": "uuid"}`
-- Backend: builds retrievers, creates graph, starts execution in background task
+- Backend: replaces any existing session (one active session at a time), then:
+  1. Loads `Settings` from `config.yaml`
+  2. Builds LLM via `init_chat_model(settings.llm.model, model_provider=settings.llm.provider, ...)`
+  3. Builds `paper_retriever` via `build_paper_retriever(file_path, settings.rag)` if PDF provided
+  4. Builds `docs_retriever` via `build_docs_retriever(target_software, settings.rag, settings.paths.software_docs_dir)`
+  5. Creates graph via `create_extraction_graph(settings, checkpointer=MemorySaver())`
+  6. Passes `llm`, `paper_retriever`, `docs_retriever`, `output_dir`, `thread_id` via the `configurable` dict
+  7. Starts graph execution in a background async task
 
 ### `GET /api/stream/{session_id}`
 SSE stream of extraction events.
@@ -142,28 +152,72 @@ class SessionManager:
     def resume_with_input(session_id, answers) -> None: ...
 ```
 
-Sessions live in memory. Single-user local tool — no database, no auth.
+### Session lifecycle
+- **One active session at a time.** Starting a new extraction replaces the previous session.
+- Uploaded temp files are cleaned up when the session is replaced or the server shuts down.
+- Sessions live in memory. Single-user local tool — no database, no auth.
+- If the user uploads a new PDF while an extraction is running, the current extraction is cancelled and a new session starts.
+
+### Additional endpoint
+- `GET /api/session/status` — returns current session state (`idle`, `running`, `waiting_input`, `complete`, or `null` if no session). Frontend calls this on page load to restore state after browser refresh.
 
 ---
 
 ## 5. SSE Streaming Implementation
 
-The backend wraps LangGraph's `.stream()` method to produce SSE events:
+### Streaming API choice
+
+Use LangGraph's `astream()` (node-level granularity). Each yield is a dict keyed by node name (e.g., `{"physics_expert": {"raw_parameters": "..."}}`). This is simpler than `astream_events()` (token-level) and sufficient for this UI — the user sees one message per agent step, not token-by-token streaming.
+
+### Node-to-SSE event mapping
+
+The graph has 5 nodes: `parse_input`, `physics_expert`, `formatter`, `ask_user`, `save_output`. Note: `check_done` is a conditional edge router, NOT a node — it never appears in `astream()` output.
 
 ```python
 async def stream_extraction(session: ExtractionSession):
     """Generator that yields SSE events from graph execution."""
     async for event in session.graph.astream(state, config=session.config):
-        # Map LangGraph events to SSE event types
-        if "physics_expert" in event:
-            yield {"type": "agent_message", "role": "physics_expert", ...}
-        if "formatter" in event:
-            yield {"type": "agent_message", "role": "formatter", ...}
-            yield {"type": "parameters_update", "data": ...}
-        # interrupt() triggers needs_input event
+        if "parse_input" in event:
+            yield {"type": "status", "message": f"Mode: {event['parse_input']['input_mode']}"}
+        elif "physics_expert" in event:
+            data = event["physics_expert"]
+            yield {"type": "agent_message", "role": "physics_expert", "content": data["raw_parameters"]}
+        elif "formatter" in event:
+            data = event["formatter"]
+            yield {"type": "agent_message", "role": "formatter", "content": data.get("formatted_parameters", {}).get("comment", "")}
+            # Assemble parameters_update from multiple state fields
+            yield {"type": "parameters_update", "data": {
+                "genic": data.get("formatted_parameters", {}).get("genic", {}),
+                "gadget": data.get("formatted_parameters", {}).get("gadget", {}),
+                "status": data.get("status", "incomplete"),
+                "missing": data.get("missing_parameters", []),
+                "sources": data.get("formatted_parameters", {}).get("sources", []),
+            }}
+            # Check if human input is needed (from state, not from check_done)
+            if data.get("status") == "needs_user_input" or data.get("user_questions"):
+                yield {"type": "needs_input", "questions": data.get("user_questions", []), "missing": data.get("missing_parameters", [])}
+        elif "save_output" in event:
+            yield {"type": "complete", "status": event["save_output"].get("status", "complete")}
+    # If graph ended without save_output (e.g., interrupt), stream ends naturally
 ```
 
-The frontend connects via `EventSource` and dispatches events to update the chat and parameter panel.
+### Interrupt/resume flow
+
+When the graph hits `interrupt()` in `ask_user`, `astream()` ends (the generator completes). The SSE stream closes. The flow is:
+
+1. SSE stream sends `needs_input` event, then closes
+2. Frontend displays the HITL question with inline input
+3. User submits answer → `POST /api/respond/{session_id}` with answers
+4. Backend calls `graph.invoke(Command(resume=answers), config=session.config)` wrapped in a new `astream()` call
+5. Frontend reconnects to `GET /api/stream/{session_id}` to receive resumed events
+
+The frontend's SSE handler must detect stream close and, if the last event was `needs_input`, show the input UI and wait. After posting the response, it reconnects to the same SSE endpoint.
+
+### Frontend SSE client
+
+Use native `EventSource` API (sufficient since the SSE endpoint is a simple GET with no auth). The `sse.ts` helper wraps `EventSource` with:
+- Auto-reconnect with exponential backoff (only after unexpected disconnects, not after `needs_input`)
+- Event type dispatching to React state updates
 
 ---
 
@@ -177,7 +231,7 @@ The frontend connects via `EventSource` and dispatches events to update the chat
 | `QuickReply.tsx` | HITL question with orange border + inline input |
 | `ParameterPanel.tsx` | Tabs, parameter table, edit mode, export |
 | `FileUpload.tsx` | Drag-drop zone + paperclip button |
-| `SettingsPage.tsx` | Settings form with save/cancel |
+| `SettingsView.tsx` | Settings form with save/cancel (conditional render, not a route) |
 
 ---
 
@@ -205,9 +259,7 @@ SimAgents/
 │   ├── src/
 │   │   ├── app/
 │   │   │   ├── layout.tsx      # Root layout with sidebar
-│   │   │   ├── page.tsx        # Main: chat + params panels
-│   │   │   └── settings/
-│   │   │       └── page.tsx    # Settings page
+│   │   │   └── page.tsx        # Main page: conditionally renders chat+params or settings
 │   │   ├── components/
 │   │   │   ├── Sidebar.tsx
 │   │   │   ├── ChatPanel.tsx
@@ -215,7 +267,7 @@ SimAgents/
 │   │   │   ├── QuickReply.tsx
 │   │   │   ├── ParameterPanel.tsx
 │   │   │   ├── FileUpload.tsx
-│   │   │   └── SettingsPage.tsx
+│   │   │   └── SettingsView.tsx  # Rendered conditionally in page.tsx, NOT a separate route
 │   │   └── lib/
 │   │       ├── api.ts          # Typed API client (fetch wrappers)
 │   │       └── sse.ts          # EventSource wrapper, event dispatching
