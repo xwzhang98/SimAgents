@@ -30,8 +30,9 @@ app.add_middleware(
 
 from simagents.api.routes import upload
 app.include_router(upload.router)
-from simagents.api.routes import settings_routes, parameters
+from simagents.api.routes import settings_routes, parameters, profiles
 app.include_router(settings_routes.router)
 app.include_router(parameters.router)
+app.include_router(profiles.router)
 from simagents.api.routes import extract
 app.include_router(extract.router)
