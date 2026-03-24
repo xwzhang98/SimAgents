@@ -118,6 +118,7 @@ def _build_graph_and_config(session):
         "user_answers": [],
         "iteration": 0,
         "messages": [],
+        "resource_estimates": {},
     }
 
 
@@ -165,8 +166,18 @@ async def _stream_events(session) -> AsyncGenerator[dict, None]:
                     session.status = "waiting_input"
                     yield {"event": "message", "data": json.dumps({"type": "needs_input", "questions": data.get("user_questions", []), "missing": data.get("missing_parameters", [])})}
             elif "save_output" in event:
-                session.status = "complete"
-                yield {"event": "message", "data": json.dumps({"type": "complete", "status": event["save_output"].get("status", "complete")})}
+                pass  # complete event is emitted after the estimator runs
+            elif "estimator" in event:
+                data = event["estimator"]
+                estimates = data.get("resource_estimates", {})
+                yield {"event": "message", "data": json.dumps({"type": "resource_estimates", "data": estimates})}
+                reasoning = estimates.get("reasoning", "")
+                if reasoning:
+                    msg = {"type": "agent_message", "role": "estimator", "content": reasoning}
+                    session.messages.append(msg)
+                    yield {"event": "message", "data": json.dumps(msg)}
+        session.status = "complete"
+        yield {"event": "message", "data": json.dumps({"type": "complete", "status": "complete"})}
     except Exception as e:
         session.status = "complete"
         yield {"event": "message", "data": json.dumps({"type": "error", "message": str(e)})}
