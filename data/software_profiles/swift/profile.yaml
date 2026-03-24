@@ -1,0 +1,27 @@
+name: SWIFT
+description: "SWIFT (SPH With Inter-dependent Fine-grained Tasking) — a modern, task-based cosmological simulation code using YAML configuration."
+family: swift
+ic_generator: external
+ic_note: "Use MUSIC/monofonIC to generate ICs. SWIFT reads box size from IC file."
+
+units:
+  length: Mpc
+  mass: Msun
+  velocity: km/s
+
+output:
+  format: yaml
+  comment_prefix: "#"
+  sections:
+    - name: params
+      description: "SWIFT YAML configuration parameters"
+      filename_template: "{paper}_params.json"
+      native_template: swift_params.yml.j2
+
+parameter_names:
+  matter_density: Omega_cdm
+  dark_energy_density: Omega_lambda
+  baryon_density: Omega_b
+  hubble_parameter: h
+  time_begin: a_begin
+  time_end: a_end

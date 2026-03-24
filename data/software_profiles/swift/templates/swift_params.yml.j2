@@ -1,0 +1,41 @@
+# SWIFT parameter file
+# Generated from: {{ paper }}
+
+{% set p = section %}
+{% if p %}
+{% if p.get('UnitMass_in_cgs') or p.get('UnitLength_in_cgs') %}
+InternalUnitSystem:
+{% for key in ['UnitMass_in_cgs', 'UnitLength_in_cgs', 'UnitVelocity_in_cgs', 'UnitCurrent_in_cgs', 'UnitTemp_in_cgs'] %}
+{% if p.get(key) is not none %}
+  {{ key }}: {{ p[key] }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if p.get('h') or p.get('Omega_cdm') %}
+Cosmology:
+{% for key in ['h', 'a_begin', 'a_end', 'Omega_cdm', 'Omega_lambda', 'Omega_b'] %}
+{% if p.get(key) is not none %}
+  {{ key }}: {{ p[key] }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if p.get('eta') or p.get('comoving_DM_softening') %}
+Gravity:
+{% for key in ['eta', 'MAC', 'theta_cr', 'comoving_DM_softening', 'max_physical_DM_softening', 'mesh_side_length'] %}
+{% if p.get(key) is not none %}
+  {{ key }}: {{ p[key] }}
+{% endif %}
+{% endfor %}
+{% endif %}
+
+{% if p.get('file_name') %}
+InitialConditions:
+{% for key in ['file_name', 'periodic', 'cleanup_h_factors', 'cleanup_velocity_factors'] %}
+{% if p.get(key) is not none %}
+  {{ key }}: {{ p[key] }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}

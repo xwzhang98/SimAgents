@@ -1,0 +1,35 @@
+name: Gadget-4
+description: "Gadget-4 — a parallel cosmological N-body/SPH code. Successor to Gadget-2/3 with improved algorithms and built-in N-GenIC IC generator."
+family: gadget
+ic_generator: builtin
+ic_note: "Gadget-4 includes N-GenIC for IC generation, configured via NGENIC parameters in the same parameter file."
+
+units:
+  length: kpc
+  mass: "1e10 Msun"
+  velocity: km/s
+
+output:
+  format: key-value
+  comment_prefix: "%"
+  sections:
+    - name: params
+      description: "Gadget-4 runtime and NGENIC parameters"
+      filename_template: "{paper}_params.json"
+      native_template: params.txt.j2
+
+parameter_names:
+  matter_density: Omega0
+  dark_energy_density: OmegaLambda
+  baryon_density: OmegaBaryon
+  hubble_parameter: HubbleParam
+  sigma8: Sigma8
+  spectral_index: NSample
+  box_size: BoxSize
+  time_begin: TimeBegin
+  time_end: TimeMax
+  output_dir: OutputDir
+  ic_file: InitCondFile
+  seed: Seed
+  grid_size: GridSize
+  output_list_filename: OutputListFilename

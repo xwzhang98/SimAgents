@@ -1,0 +1,31 @@
+name: Arepo
+description: "Arepo — a moving-mesh magnetohydrodynamics code for cosmological simulations using a Voronoi tessellation."
+family: gadget
+ic_generator: external
+ic_note: "Use MUSIC or N-GenIC to generate initial conditions for Arepo."
+
+units:
+  length: kpc
+  mass: "1e10 Msun"
+  velocity: km/s
+
+output:
+  format: key-value
+  comment_prefix: "%"
+  sections:
+    - name: params
+      description: "Arepo runtime parameters"
+      filename_template: "{paper}_params.json"
+      native_template: params.txt.j2
+
+parameter_names:
+  matter_density: Omega0
+  dark_energy_density: OmegaLambda
+  baryon_density: OmegaBaryon
+  hubble_parameter: HubbleParam
+  box_size: BoxSize
+  time_begin: TimeBegin
+  time_end: TimeMax
+  output_dir: OutputDir
+  ic_file: InitCondFile
+  output_list_filename: OutputListFilename

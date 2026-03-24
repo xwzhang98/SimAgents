@@ -1,0 +1,39 @@
+name: MP-Gadget
+description: "Massively Parallel Gadget — a modern SPH + N-body cosmological simulation code with built-in IC generation (MP-GenIC)."
+family: gadget
+ic_generator: builtin
+ic_note: "MP-Gadget includes MP-GenIC for initial condition generation. Configure GenIC parameters in a separate parameter file."
+
+units:
+  length: kpc/h
+  mass: "1e10 Msun/h"
+  velocity: km/s
+
+output:
+  format: key-value
+  comment_prefix: "#"
+  sections:
+    - name: genic
+      description: "MP-GenIC initial conditions parameters"
+      filename_template: "{paper}_genic.json"
+      native_template: genic_params.txt.j2
+    - name: gadget
+      description: "MP-Gadget runtime parameters"
+      filename_template: "{paper}_gadget.json"
+      native_template: gadget_params.txt.j2
+
+parameter_names:
+  matter_density: Omega0
+  dark_energy_density: OmegaLambda
+  baryon_density: OmegaBaryon
+  hubble_parameter: HubbleParam
+  sigma8: Sigma8
+  spectral_index: PrimordialIndex
+  box_size: BoxSize
+  time_end: TimeMax
+  output_dir: OutputDir
+  ic_file: InitCondFile
+  seed: Seed
+  starting_redshift: Redshift
+  grid_size: Ngrid
+  mesh_size: Nmesh

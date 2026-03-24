@@ -1,0 +1,37 @@
+name: GIZMO
+description: "GIZMO — a multi-method magnetohydrodynamics + gravity code supporting meshless finite-mass (MFM), meshless finite-volume (MFV), and SPH methods."
+family: gadget
+ic_generator: external
+ic_note: "Use MUSIC or N-GenIC to generate initial conditions for GIZMO."
+
+units:
+  length: kpc
+  mass: "1e10 Msun"
+  velocity: km/s
+
+output:
+  format: key-value
+  comment_prefix: "%"
+  sections:
+    - name: params
+      description: "GIZMO runtime parameters"
+      filename_template: "{paper}_params.json"
+      native_template: params.txt.j2
+
+parameter_names:
+  matter_density: Omega0
+  dark_energy_density: OmegaLambda
+  baryon_density: OmegaBaryon
+  hubble_parameter: HubbleParam
+  box_size: BoxSize
+  time_begin: TimeBegin
+  time_end: TimeMax
+  output_dir: OutputDir
+  ic_file: InitCondFile
+  output_list_filename: OutputListFilename
+  softening_halo: SofteningHalo
+  softening_gas: SofteningGas
+  softening_disk: SofteningDisk
+  softening_bulge: SofteningBulge
+  softening_stars: SofteningStars
+  softening_bndry: SofteningBndry

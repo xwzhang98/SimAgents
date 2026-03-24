@@ -1,0 +1,8 @@
+% Gadget-4 parameter file
+% Generated from: {{ paper }}
+{% set p = section %}
+{% if p %}
+{% for key, value in p.items() %}
+{{ key }}              {{ value }}
+{% endfor %}
+{% endif %}
