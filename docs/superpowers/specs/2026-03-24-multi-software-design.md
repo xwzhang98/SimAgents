@@ -107,6 +107,10 @@ parameter_names:
   starting_redshift: "Redshift"
 ```
 
+### Scope of `parameter_names`
+
+The mapping covers **~15 core cosmological/simulation parameters** that appear in virtually every simulation paper and have different names across codes. It is NOT intended to be exhaustive. For parameters not in the mapping (e.g., Arepo's `CellShapingSpeed`, GIZMO's `ArtBulkViscConst`), the LLM discovers them via RAG search of the software's docs and uses the software-native name directly. The mapping is a translation aid for the most common parameters, not a complete registry.
+
 ### Software-specific profiles
 
 **MP-Gadget** — 2 sections (genic + gadget), builtin IC generator, kpc/h units
@@ -138,7 +142,24 @@ def load_profile(software_name: str, profiles_dir: str = "data/software_profiles
 def list_profiles(profiles_dir: str = "data/software_profiles") -> list[dict]
 ```
 
-`load_profile()` reads `profile.yaml`, validates it with Pydantic, and returns a `SoftwareProfile` object. `list_profiles()` scans all subdirectories for profiles.
+`load_profile()` reads `profile.yaml`, validates it with Pydantic, and returns a `SoftwareProfile` object. Validation is **eager** — if the YAML is malformed or required fields are missing, raises `ValueError` with a clear message. If `docs/` is empty, raises `FileNotFoundError`. This happens when the extract endpoint is called (before graph starts), so the user gets an immediate API error.
+
+`list_profiles()` scans all subdirectories for profiles. Skips directories without `profile.yaml` (no error).
+
+### The `family` field
+
+The `family` field (`"gadget"` | `"swift"` | `"enzo"`) controls a single sentence injected into the physics_expert prompt:
+
+- `family: "gadget"` → "This paper likely uses Gadget-family terminology (Omega0, HubbleParam, BoxSize in kpc/h)."
+- `family: "swift"` → "This paper may use SWIFT terminology (Omega_cdm, h, box size in Mpc)."
+
+This is a hint, not a constraint. The physics expert still extracts canonical physics values regardless. The family helps when the same concept has different names in different communities (e.g., papers by SWIFT groups say "Omega_cdm" while Gadget groups say "Omega0").
+
+If `family` is unknown or omitted, no hint is injected.
+
+### `ic_notes` generation
+
+`ic_notes` is computed **deterministically** from the profile, not by the LLM. When `profile.ic_generator == "external"`, the formatter node's post-processing code scans the extracted parameters for IC-relevant ones (starting redshift, sigma8, spectral index, seed) and generates notes like "Sigma8=0.8159 needed for IC generator". This avoids LLM reliability issues.
 
 ---
 
@@ -169,16 +190,49 @@ The biggest change. New behavior:
 
 ### Formatter prompt changes
 
-`prompts/formatter.md` updated to use generic `sections` output:
+`prompts/formatter.md` becomes a template that the formatter node renders with profile data before passing to the LLM. The profile injects: software name, section names, parameter naming reference, unit conventions, and IC generator info.
 
-```json
+**Concrete example of the rendered formatter prompt (for Gadget-4):**
+
+```
+You are an expert in Gadget-4 simulation software configuration.
+You have access to Gadget-4 documentation through search.
+
+## Target Software: Gadget-4
+
+## Output Sections
+Your output MUST use these section names:
+- "params": Runtime + IC parameter file
+
+## Parameter Naming Reference
+Use these exact parameter names for Gadget-4 (canonical → Gadget-4):
+- Matter density → Omega0
+- Dark energy density → OmegaLambda
+- Baryon density → OmegaBaryon
+- Hubble parameter → HubbleParam
+- Box size → BoxSize (unit: kpc)
+- Sigma8 → Sigma8
+- ...
+
+## Unit Conventions
+- Length: kpc (NOTE: papers often quote Mpc/h — convert by multiplying by 1000/h)
+- Mass: 10^10 M_sun
+- Velocity: km/s
+
+## IC Generator Info
+Gadget-4 has built-in NGENIC. IC parameters go in the same "params" section.
+
+## Output Format
+Respond with ONLY this JSON:
 {
   "sections": {
-    "<section_name>": {
-      "<software_specific_param>": "value"
+    "params": {
+      "Omega0": 0.3089,
+      "BoxSize": 75000,
+      ...
     }
   },
-  "ic_notes": ["list of IC-relevant params when ic_generator is external"],
+  "ic_notes": [],
   "comment": "...",
   "sources": [...],
   "status": "complete|incomplete|needs_user_input",
@@ -187,7 +241,29 @@ The biggest change. New behavior:
 }
 ```
 
-The profile's section names, parameter naming conventions, and unit conventions are injected into the prompt.
+**For SWIFT, the rendered prompt would differ:**
+- Section name: `"params"` but with SWIFT naming (`Omega_cdm`, `h`, `a_begin`)
+- Unit note: "Length: Mpc" instead of "kpc"
+- IC note: "SWIFT uses external IC generator (MUSIC/monofonIC). Flag IC-relevant params in ic_notes."
+- Output example uses SWIFT parameter names
+
+**How `parameter_names` is used:** The mapping dict is rendered as a reference table in the prompt (as shown above). The LLM uses it to translate the physics expert's canonical values into the correct software-specific names. This is prompt-injected, not post-processed — the LLM does the translation. For parameters NOT in the mapping, the LLM discovers them from the RAG docs and uses the software-native name directly. The mapping covers ~15 core cosmological parameters; software-specific parameters (e.g., Arepo mesh refinement) are discovered via RAG.
+
+### Formatter fallback on JSON parse failure
+
+When the LLM returns unparseable JSON, the fallback structure becomes:
+
+```python
+{
+    "sections": {},
+    "ic_notes": [],
+    "comment": response.content,
+    "sources": [],
+    "status": "incomplete",
+    "missing_parameters": ["JSON_PARSE_FAILED"],
+    "user_questions": []
+}
+```
 
 ### Save Output Node
 
@@ -222,7 +298,35 @@ class ExtractionOutput(TypedDict):
     sources: list[dict]
 ```
 
-Replaces `genic_parameters` + `gadget_parameters`. The `ExtractionState` updates similarly — `formatted_parameters` becomes the sections-based structure.
+Replaces `genic_parameters` + `gadget_parameters`.
+
+### `ExtractionState.formatted_parameters` shape
+
+The `formatted_parameters` field in `ExtractionState` (currently typed as `dict`) will hold the full formatter output:
+
+```python
+{
+    "sections": {"params": {"Omega0": 0.3089, ...}},
+    "ic_notes": [],
+    "comment": "...",
+    "sources": [...],
+}
+```
+
+The `status`, `missing_parameters`, and `user_questions` remain as separate top-level state fields (not nested inside `formatted_parameters`), consistent with the current design.
+
+### `SoftwareProfile` carries slug
+
+The `SoftwareProfile` class includes both the slug (directory name, e.g., `"mp-gadget"`) and display name:
+
+```python
+class SoftwareProfile:
+    slug: str               # Directory name, used for lookups and paths
+    name: str               # Display name from profile.yaml
+    ...
+```
+
+`load_profile("mp-gadget")` sets `slug="mp-gadget"` from the directory name.
 
 ---
 
@@ -240,7 +344,7 @@ def export_native(profile: SoftwareProfile, sections: dict, paper_name: str) -> 
     """
 ```
 
-Uses `jinja2` (already available as a transitive dependency).
+Uses `jinja2` — add as an explicit dependency in `pyproject.toml` and `requirements.txt` (currently available transitively via FastAPI/Starlette, but should be direct to avoid breakage).
 
 ### Export ZIP contents
 
@@ -265,8 +369,33 @@ If no template exists for a profile, export produces JSON only. This allows addi
 ### Modified endpoints
 
 - **`GET /api/parameters/{id}`** — response changes from `{genic, gadget, status, missing, sources}` to `{sections, ic_notes, status, missing, sources}`
+- **`PUT /api/parameters/{id}`** — request changes from `{genic?, gadget?}` to `{sections: {section_name: {param: value}}}`. The route iterates over provided sections and merges into the session's parameters.
 - **`GET /api/parameters/{id}/export`** — ZIP now includes native param files when templates available
-- **`POST /api/extract`** — passes loaded `SoftwareProfile` to the graph via `configurable` dict
+- **`POST /api/extract`** — loads `SoftwareProfile` via `load_profile(target_software)` and passes it to the graph via `configurable` dict alongside llm, retrievers, etc.
+
+### SSE `parameters_update` event migration
+
+The SSE event in `extract.py` changes from:
+
+```python
+# Old (hardcoded genic/gadget)
+params = {"genic": fmt.get("genic", {}), "gadget": fmt.get("gadget", {}), ...}
+```
+
+To:
+
+```python
+# New (generic sections)
+params = {
+    "sections": fmt.get("sections", {}),
+    "ic_notes": fmt.get("ic_notes", []),
+    "status": data.get("status", "incomplete"),
+    "missing": data.get("missing_parameters", []),
+    "sources": fmt.get("sources", []),
+}
+```
+
+The frontend `ParametersData` type updates accordingly — `genic`/`gadget` replaced by `sections: Record<string, Record<string, unknown>>`.
 
 ### Unchanged endpoints
 
