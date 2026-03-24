@@ -71,6 +71,7 @@ def main():
             "user_answers": [],
             "iteration": 0,
             "messages": [],
+            "resource_estimates": {},
         },
         config={
             "configurable": {
@@ -102,6 +103,17 @@ def main():
         print("\n--- IC Notes ---")
         for note in ic_notes:
             print(f"  {note}")
+
+    estimates = result.get("resource_estimates", {})
+    if estimates and estimates.get("total_cpu_hours"):
+        print("\n--- Resource Estimates ---")
+        print(f"Memory: {estimates.get('memory_per_node_gb', '?')} GB/node")
+        print(f"CPU-hours: {estimates.get('total_cpu_hours', '?'):,}")
+        print(f"Wall-clock: {estimates.get('wall_clock', '?')}")
+        print(f"Storage: {estimates.get('storage_tb', '?')} TB")
+        print(f"Nodes: {estimates.get('recommended_nodes', '?')}")
+        print(f"Confidence: {estimates.get('confidence', '?')}")
+        print(f"Based on: {estimates.get('reference_simulation', '?')}")
 
     print(f"\nOutput saved to: {settings.paths.output_dir}/")
 
