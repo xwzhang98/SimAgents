@@ -7,6 +7,7 @@ from simagents.config.settings import Settings
 from simagents.graph.parameter_extraction import create_extraction_graph
 from simagents.tools.pdf_loader import build_paper_retriever
 from simagents.tools.docs_loader import build_docs_retriever
+from simagents.profiles import load_profile
 
 
 def _get_llm(settings: Settings):
@@ -35,24 +36,74 @@ def main():
         settings.extraction.target_software = args.software
     if args.output:
         settings.paths.output_dir = args.output
+
+    target = settings.extraction.target_software
     print(f"Using LLM: {settings.llm.provider}/{settings.llm.model}")
+
+    # Load software profile
+    profile = load_profile(target, settings.paths.software_profiles_dir)
+    print(f"Loaded profile: {profile.name} ({profile.family} family)")
+
     llm = _get_llm(settings)
     paper_retriever = None
     if args.paper:
         print(f"Loading paper: {args.paper}")
         paper_retriever = build_paper_retriever(args.paper, settings.rag)
-    print(f"Loading {settings.extraction.target_software} docs...")
-    docs_retriever = build_docs_retriever(settings.extraction.target_software, settings.rag, software_docs_dir=settings.paths.software_docs_dir)
+
+    print(f"Loading {profile.name} docs...")
+    docs_retriever = build_docs_retriever(profile.docs_dir, settings.rag)
+
     graph = create_extraction_graph(settings, checkpointer=MemorySaver())
     print("Starting parameter extraction...")
     result = graph.invoke(
-        {"paper_path": args.paper, "user_parameters": None, "target_software": settings.extraction.target_software, "custom_prompt": args.prompt, "max_iterations": settings.extraction.max_iterations, "input_mode": "", "raw_parameters": "", "formatted_parameters": {}, "status": "", "missing_parameters": [], "user_questions": [], "user_answers": [], "iteration": 0, "messages": []},
-        config={"configurable": {"llm": llm, "paper_retriever": paper_retriever, "docs_retriever": docs_retriever, "output_dir": settings.paths.output_dir, "thread_id": "cli-main"}},
+        {
+            "paper_path": args.paper,
+            "user_parameters": None,
+            "target_software": target,
+            "custom_prompt": args.prompt,
+            "max_iterations": settings.extraction.max_iterations,
+            "input_mode": "",
+            "raw_parameters": "",
+            "formatted_parameters": {},
+            "status": "",
+            "missing_parameters": [],
+            "user_questions": [],
+            "user_answers": [],
+            "iteration": 0,
+            "messages": [],
+        },
+        config={
+            "configurable": {
+                "llm": llm,
+                "paper_retriever": paper_retriever,
+                "docs_retriever": docs_retriever,
+                "profile": profile,
+                "output_dir": settings.paths.output_dir,
+                "thread_id": "cli-main",
+            }
+        },
     )
+
     print(f"\nExtraction status: {result.get('status', 'unknown')}")
     if result.get("missing_parameters"):
         print(f"Missing parameters: {', '.join(result['missing_parameters'])}")
-    print(f"Output saved to: {settings.paths.output_dir}/")
+
+    # Display sections
+    formatted = result.get("formatted_parameters", {})
+    sections = formatted.get("sections", {})
+    for section_name, params in sections.items():
+        print(f"\n--- {section_name} ---")
+        if isinstance(params, dict):
+            for k, v in params.items():
+                print(f"  {k}: {v}")
+
+    ic_notes = formatted.get("ic_notes", [])
+    if ic_notes:
+        print("\n--- IC Notes ---")
+        for note in ic_notes:
+            print(f"  {note}")
+
+    print(f"\nOutput saved to: {settings.paths.output_dir}/")
 
 
 if __name__ == "__main__":
