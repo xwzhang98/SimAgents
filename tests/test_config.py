@@ -12,7 +12,7 @@ from simagents.config.settings import Settings, LLMSettings, RAGSettings, Extrac
 def test_default_settings():
     settings = Settings()
     assert settings.llm.provider == "openai"
-    assert settings.llm.model == "gpt-4o"
+    assert settings.llm.model == "gpt-5.4-mini"
     assert settings.llm.temperature == 0.01
     assert settings.rag.vector_store == "chroma"
     assert settings.rag.pdf_loader == "unstructured"
