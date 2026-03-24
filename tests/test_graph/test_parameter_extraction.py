@@ -29,7 +29,17 @@ def test_graph_paper_mode_complete():
         "missing_parameters": [],
         "user_questions": [],
     }))
-    mock_llm.invoke.side_effect = [extraction_response, formatter_response]
+    estimator_response = AIMessage(content=json.dumps({
+        "memory_per_node_gb": 32.0,
+        "total_cpu_hours": 1000,
+        "wall_clock": "1 hour",
+        "storage_tb": 0.1,
+        "recommended_nodes": 4,
+        "confidence": "low",
+        "reference_simulation": "BlueTides",
+        "reasoning": "Small test simulation; scaled from BlueTides reference.",
+    }))
+    mock_llm.invoke.side_effect = [extraction_response, formatter_response, estimator_response]
     mock_paper_retriever = MagicMock()
     mock_paper_retriever.invoke.return_value = [MagicMock(page_content="BoxSize = 100 Mpc/h")]
     mock_docs_retriever = MagicMock()
@@ -70,8 +80,11 @@ def test_graph_paper_mode_complete():
             "user_answers": [],
             "iteration": 0,
             "messages": [],
+            "resource_estimates": {},
         },
         config={"configurable": {"llm": mock_llm, "paper_retriever": mock_paper_retriever, "docs_retriever": mock_docs_retriever, "profile": profile, "output_dir": "/tmp/simagents_test", "thread_id": "test-1"}},
     )
     assert result["status"] == "complete"
     assert result["formatted_parameters"]["sections"]["genic"]["BoxSize"] == 100000
+    assert isinstance(result["resource_estimates"], dict)
+    assert result["resource_estimates"].get("memory_per_node_gb") == 32.0
