@@ -25,3 +25,4 @@ class ExtractionState(TypedDict):
     iteration: int
     max_iterations: int
     messages: Annotated[list[BaseMessage], add_messages]
+    resource_estimates: dict

@@ -17,6 +17,7 @@ rag:
 extraction:
   max_iterations: 2
   target_software: "mp-gadget"    # "mp-gadget" | "arepo" | "gadget-4" | "enzo"
+  run_estimator: true
 
 paths:
   output_dir: "./output"

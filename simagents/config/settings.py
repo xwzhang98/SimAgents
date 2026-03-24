@@ -35,6 +35,7 @@ class RAGSettings(BaseModel):
 class ExtractionSettings(BaseModel):
     max_iterations: int = 2
     target_software: str = "mp-gadget"
+    run_estimator: bool = True
 
 
 class PathSettings(BaseModel):

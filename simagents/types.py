@@ -15,6 +15,18 @@ class ExtractionInput(TypedDict, total=False):
     custom_prompt: str | None
 
 
+class ResourceEstimates(TypedDict):
+    """Resource estimates for a cosmological simulation."""
+    memory_per_node_gb: float
+    total_cpu_hours: int
+    wall_clock: str
+    storage_tb: float
+    recommended_nodes: int
+    confidence: str
+    reference_simulation: str
+    reasoning: str
+
+
 class ExtractionOutput(TypedDict):
     """Output contract for the extraction graph."""
     sections: dict[str, dict]       # {"params": {...}} or {"genic": {...}, "gadget": {...}}
@@ -23,3 +35,4 @@ class ExtractionOutput(TypedDict):
     missing: list[str]
     comment: str
     sources: list[dict]  # [{param, value, location, page}]
+    resource_estimates: dict

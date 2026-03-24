@@ -31,6 +31,7 @@ def test_extraction_output_complete():
         "missing": [],
         "comment": "All parameters found.",
         "sources": [{"param": "BoxSize", "value": 100000, "location": "Section 3", "page": 5}],
+        "resource_estimates": {},
     }
     assert out["status"] == "complete"
     assert len(out["missing"]) == 0
@@ -45,6 +46,7 @@ def test_extraction_output_incomplete():
         "missing": ["Omega0", "HubbleParam"],
         "comment": "Could not find all parameters.",
         "sources": [],
+        "resource_estimates": {},
     }
     assert out["status"] == "incomplete"
     assert "Omega0" in out["missing"]
