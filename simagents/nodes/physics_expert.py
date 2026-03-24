@@ -44,7 +44,14 @@ def physics_expert(state: ExtractionState, config: RunnableConfig) -> dict:
     paper_retriever = configurable.get("paper_retriever")
     target_software = state.get("target_software", "mp-gadget")
     input_context = _build_input_context(state)
-    system_prompt = _load_prompt(target_software, input_context, state.get("custom_prompt"))
+    # Build family hint from profile if available
+    profile = configurable.get("profile")
+    family_hint = ""
+    if profile:
+        family_hint = f"This software belongs to the '{profile.family}' family of simulation codes."
+        if profile.ic_generator != "none":
+            family_hint += f" IC generation: {profile.ic_generator}. {profile.ic_note}"
+    system_prompt = _load_prompt(target_software, input_context, state.get("custom_prompt"), family_hint=family_hint)
     user_msg_parts = ["Please extract the simulation parameters from the provided source."]
     if paper_retriever and state.get("input_mode") in ("paper", "hybrid"):
         search_queries = [

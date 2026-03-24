@@ -7,7 +7,7 @@ from simagents.config.settings import RAGSettings
 
 
 def test_build_docs_retriever_loads_markdown_files(tmp_path):
-    docs_dir = tmp_path / "software_docs" / "mp-gadget"
+    docs_dir = tmp_path / "mp-gadget-docs"
     docs_dir.mkdir(parents=True)
     (docs_dir / "param_ref.md").write_text("# Params\nBoxSize: kpc/h")
     (docs_dir / "genic_ref.md").write_text("# GenIC\nNgrid: particle count")
@@ -16,7 +16,7 @@ def test_build_docs_retriever_loads_markdown_files(tmp_path):
             mock_retriever = MagicMock()
             mock_vs.return_value.as_retriever.return_value = mock_retriever
             rag_settings = RAGSettings()
-            retriever = build_docs_retriever("mp-gadget", rag_settings, software_docs_dir=str(tmp_path / "software_docs"))
+            retriever = build_docs_retriever(docs_dir, rag_settings)
             assert retriever == mock_retriever
             call_args = mock_vs.call_args
             docs = call_args[0][0]
@@ -24,7 +24,6 @@ def test_build_docs_retriever_loads_markdown_files(tmp_path):
 
 
 def test_build_docs_retriever_unknown_software_raises(tmp_path):
-    docs_dir = tmp_path / "software_docs"
-    docs_dir.mkdir()
+    docs_dir = tmp_path / "nonexistent_docs"
     with pytest.raises(FileNotFoundError, match="No docs found"):
-        build_docs_retriever("nonexistent-software", RAGSettings(), software_docs_dir=str(docs_dir))
+        build_docs_retriever(docs_dir, RAGSettings())

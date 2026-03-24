@@ -14,10 +14,31 @@ def save_output(state: ExtractionState, config: RunnableConfig) -> dict:
     formatted = state.get("formatted_parameters", {})
     comment = formatted.get("comment", "")
     sources = formatted.get("sources", [])
-    genic_file = output_dir / f"{paper_name}_genic.json"
-    genic_data = {"source": paper_path or "user_input", "parameters": formatted.get("genic", {}), "comment": comment, "sources": sources}
-    genic_file.write_text(json.dumps(genic_data, indent=2))
-    gadget_file = output_dir / f"{paper_name}_gadget.json"
-    gadget_data = {"source": paper_path or "user_input", "parameters": formatted.get("gadget", {}), "comment": comment, "sources": sources}
-    gadget_file.write_text(json.dumps(gadget_data, indent=2))
+
+    profile = config.get("configurable", {}).get("profile")
+    sections = formatted.get("sections", {})
+
+    if profile and profile.output_sections:
+        # Write one file per output section using profile's filename template
+        for section in profile.output_sections:
+            filename = section.filename_template.format(paper=paper_name)
+            section_data = {
+                "source": paper_path or "user_input",
+                "parameters": sections.get(section.name, {}),
+                "comment": comment,
+                "sources": sources,
+            }
+            (output_dir / filename).write_text(json.dumps(section_data, indent=2))
+    else:
+        # Fallback: write each section key as a separate file
+        for section_name, params in sections.items():
+            filename = f"{paper_name}_{section_name}.json"
+            section_data = {
+                "source": paper_path or "user_input",
+                "parameters": params if isinstance(params, dict) else {},
+                "comment": comment,
+                "sources": sources,
+            }
+            (output_dir / filename).write_text(json.dumps(section_data, indent=2))
+
     return {"status": state.get("status", "incomplete")}
