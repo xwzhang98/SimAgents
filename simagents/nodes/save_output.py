@@ -21,7 +21,7 @@ def save_output(state: ExtractionState, config: RunnableConfig) -> dict:
     if profile and profile.output_sections:
         # Write one file per output section using profile's filename template
         for section in profile.output_sections:
-            filename = section.filename_template.format(paper=paper_name)
+            filename = section.filename_template.format(paper=paper_name, name=section.name)
             section_data = {
                 "source": paper_path or "user_input",
                 "parameters": sections.get(section.name, {}),

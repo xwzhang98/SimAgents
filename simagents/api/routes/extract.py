@@ -12,6 +12,7 @@ from simagents.api.session import session_manager
 from simagents.api.routes.upload import get_upload_path
 from simagents.config.settings import Settings
 from simagents.graph.parameter_extraction import create_extraction_graph
+from simagents.profiles import load_profile
 
 router = APIRouter()
 CONFIG_PATH = os.environ.get("SIMAGENTS_CONFIG", str(Path(__file__).resolve().parents[3] / "config.yaml"))
@@ -42,6 +43,9 @@ async def start_extraction(req: ExtractRequest):
     session = session_manager.get_session(session_id)
     session.status = "running"
 
+    # Load software profile
+    profile = load_profile(target, settings.paths.software_profiles_dir)
+
     # Store request params for deferred setup in _stream_events
     session._extract_request = {
         "file_path": file_path,
@@ -49,6 +53,7 @@ async def start_extraction(req: ExtractRequest):
         "custom_prompt": req.custom_prompt,
         "user_parameters": req.user_parameters,
         "settings": settings,
+        "profile": profile,
     }
 
     return {"session_id": session_id}
@@ -81,7 +86,8 @@ def _build_graph_and_config(session):
     if req["file_path"]:
         paper_retriever = build_paper_retriever(req["file_path"], settings.rag)
 
-    docs_retriever = build_docs_retriever(target, settings.rag, settings.paths.software_docs_dir)
+    profile = req["profile"]
+    docs_retriever = build_docs_retriever(profile.docs_dir, settings.rag)
 
     # Build graph
     graph = create_extraction_graph(settings, checkpointer=MemorySaver())
@@ -92,6 +98,7 @@ def _build_graph_and_config(session):
             "llm": llm,
             "paper_retriever": paper_retriever,
             "docs_retriever": docs_retriever,
+            "profile": profile,
             "output_dir": settings.paths.output_dir,
             "thread_id": "gui-session",
         }
@@ -146,8 +153,8 @@ async def _stream_events(session) -> AsyncGenerator[dict, None]:
                 session.messages.append(msg)
                 yield {"event": "message", "data": json.dumps(msg)}
                 params = {
-                    "genic": fmt.get("genic", {}),
-                    "gadget": fmt.get("gadget", {}),
+                    "sections": fmt.get("sections", {}),
+                    "ic_notes": fmt.get("ic_notes", []),
                     "status": data.get("status", "incomplete"),
                     "missing": data.get("missing_parameters", []),
                     "sources": fmt.get("sources", []),
