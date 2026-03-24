@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { ParametersData } from "@/lib/types";
 import { updateParameters, getExportUrl } from "@/lib/api";
 
@@ -9,40 +9,38 @@ interface ParameterPanelProps {
   sessionId: string | null;
 }
 
-type Tab = "genic" | "gadget" | "sources";
-
 export default function ParameterPanel({ parameters, sessionId }: ParameterPanelProps) {
-  const [tab, setTab] = useState<Tab>("genic");
+  const [tab, setTab] = useState<string>("");
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState<Record<string, unknown>>({});
 
+  // Dynamic tabs from sections keys + "sources"
+  const tabs = useMemo(() => {
+    if (!parameters) return [];
+    const sectionKeys = Object.keys(parameters.sections || {});
+    return [...sectionKeys, "sources"];
+  }, [parameters]);
+
+  // Auto-select first tab when tabs change
+  const activeTab = tabs.includes(tab) ? tab : (tabs[0] || "");
+
   const handleEdit = () => {
-    if (!parameters) return;
+    if (!parameters || activeTab === "sources") return;
     setEditMode(true);
-    setEditData(
-      tab === "genic"
-        ? { ...parameters.genic }
-        : tab === "gadget"
-          ? { ...parameters.gadget }
-          : {}
-    );
+    setEditData({ ...(parameters.sections[activeTab] || {}) });
   };
 
   const handleSave = useCallback(async () => {
-    if (!sessionId || !parameters) return;
+    if (!sessionId || !parameters || activeTab === "sources") return;
     try {
-      const payload =
-        tab === "genic"
-          ? { genic: editData }
-          : tab === "gadget"
-            ? { gadget: editData }
-            : {};
-      await updateParameters(sessionId, payload);
+      await updateParameters(sessionId, {
+        sections: { [activeTab]: editData as Record<string, unknown> },
+      });
       setEditMode(false);
     } catch (err) {
       console.error("Failed to save parameters:", err);
     }
-  }, [sessionId, parameters, tab, editData]);
+  }, [sessionId, parameters, activeTab, editData]);
 
   const handleCancel = () => {
     setEditMode(false);
@@ -55,11 +53,7 @@ export default function ParameterPanel({ parameters, sessionId }: ParameterPanel
   };
 
   const currentParams =
-    tab === "genic"
-      ? parameters?.genic
-      : tab === "gadget"
-        ? parameters?.gadget
-        : null;
+    activeTab !== "sources" ? parameters?.sections[activeTab] : null;
 
   const missingSet = new Set(parameters?.missing || []);
 
@@ -69,7 +63,7 @@ export default function ParameterPanel({ parameters, sessionId }: ParameterPanel
       <div className="flex items-center justify-between border-b border-[#1a1a2e] px-4 py-4">
         <h3 className="text-sm font-semibold text-[#e2e8f0]">Parameters</h3>
         <div className="flex items-center gap-2">
-          {!editMode && tab !== "sources" && (
+          {!editMode && activeTab !== "sources" && (
             <button
               onClick={handleEdit}
               disabled={!parameters}
@@ -104,22 +98,33 @@ export default function ParameterPanel({ parameters, sessionId }: ParameterPanel
         </div>
       </div>
 
+      {/* IC Notes banner */}
+      {parameters && parameters.ic_notes && parameters.ic_notes.length > 0 && (
+        <div className="border-b border-[#1a1a2e] bg-[#1a1a2e]/50 px-4 py-2.5">
+          {parameters.ic_notes.map((note, i) => (
+            <p key={i} className="text-xs text-[#f59e0b]">
+              {note}
+            </p>
+          ))}
+        </div>
+      )}
+
       {/* Tabs */}
-      <div className="flex border-b border-[#1a1a2e]">
-        {(["genic", "gadget", "sources"] as Tab[]).map((t) => (
+      <div className="flex border-b border-[#1a1a2e] overflow-x-auto">
+        {tabs.map((t) => (
           <button
             key={t}
             onClick={() => {
               setTab(t);
               setEditMode(false);
             }}
-            className={`flex-1 py-2.5 text-xs font-medium transition-colors ${
-              tab === t
+            className={`flex-1 min-w-0 py-2.5 text-xs font-medium transition-colors whitespace-nowrap px-2 ${
+              activeTab === t
                 ? "border-b-2 border-[#7c3aed] text-[#7c3aed]"
                 : "text-[#666] hover:text-[#9ca3af]"
             }`}
           >
-            {t === "genic" ? "GenIC" : t === "gadget" ? "Gadget" : "Sources"}
+            {t === "sources" ? "Sources" : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
       </div>
@@ -132,7 +137,7 @@ export default function ParameterPanel({ parameters, sessionId }: ParameterPanel
               No parameters yet. Upload a paper to start extraction.
             </p>
           </div>
-        ) : tab === "sources" ? (
+        ) : activeTab === "sources" ? (
           <SourcesTab sources={parameters.sources} />
         ) : (
           <ParamTable

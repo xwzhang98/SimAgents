@@ -1,4 +1,4 @@
-import type { SettingsData, ParametersData, Message } from "./types";
+import type { SettingsData, ParametersData, Message, ProfileInfo, ProfileDetail } from "./types";
 
 const API_BASE = "http://localhost:8000";
 
@@ -56,7 +56,7 @@ export async function getParameters(sessionId: string): Promise<ParametersData> 
   return res.json();
 }
 
-export async function updateParameters(sessionId: string, data: { genic?: Record<string, unknown>; gadget?: Record<string, unknown> }): Promise<ParametersData> {
+export async function updateParameters(sessionId: string, data: { sections?: Record<string, Record<string, unknown>> }): Promise<ParametersData> {
   const res = await fetch(`${API_BASE}/api/parameters/${sessionId}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -76,6 +76,18 @@ export function getStreamUrl(sessionId: string): string {
 
 export async function getSessionStatus(): Promise<{ status: string | null; session_id: string | null; messages: Message[]; parameters: Record<string, unknown> }> {
   const res = await fetch(`${API_BASE}/api/session/status`);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function getProfiles(): Promise<ProfileInfo[]> {
+  const res = await fetch(`${API_BASE}/api/profiles`);
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+export async function getProfile(software: string): Promise<ProfileDetail> {
+  const res = await fetch(`${API_BASE}/api/profiles/${software}`);
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }

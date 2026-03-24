@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { SettingsData } from "@/lib/types";
-import { getSettings, updateSettings } from "@/lib/api";
+import type { SettingsData, ProfileInfo } from "@/lib/types";
+import { getSettings, updateSettings, getProfiles } from "@/lib/api";
 
 export default function SettingsView() {
   const [settings, setSettings] = useState<SettingsData | null>(null);
@@ -11,13 +11,15 @@ export default function SettingsView() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [profiles, setProfiles] = useState<ProfileInfo[]>([]);
 
   useEffect(() => {
     setLoading(true);
-    getSettings()
-      .then((data) => {
+    Promise.all([getSettings(), getProfiles().catch(() => [])])
+      .then(([data, profileList]) => {
         setSettings(data);
         setDraft(data);
+        setProfiles(profileList);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -202,16 +204,38 @@ export default function SettingsView() {
             }
             type="number"
           />
-          <Field
-            label="Target Software"
-            value={draft.extraction.target_software}
-            onChange={(v) =>
-              setDraft({
-                ...draft,
-                extraction: { ...draft.extraction, target_software: v },
-              })
-            }
-          />
+          <div className="flex items-center justify-between gap-4">
+            <label className="shrink-0 text-sm text-[#9ca3af]">Target Software</label>
+            <div className="flex flex-col items-end gap-1">
+              <select
+                value={draft.extraction.target_software}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    extraction: { ...draft.extraction, target_software: e.target.value },
+                  })
+                }
+                className="w-64 rounded-lg border border-[#2a2a4a] bg-[#12122a] px-3 py-2 text-sm text-[#e2e8f0]"
+              >
+                {profiles.length > 0 ? (
+                  profiles.map((p) => (
+                    <option key={p.slug} value={p.slug}>
+                      {p.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value={draft.extraction.target_software}>
+                    {draft.extraction.target_software}
+                  </option>
+                )}
+              </select>
+              {profiles.find((p) => p.slug === draft.extraction.target_software)?.description && (
+                <span className="text-xs text-[#666] max-w-[16rem] text-right">
+                  {profiles.find((p) => p.slug === draft.extraction.target_software)?.description}
+                </span>
+              )}
+            </div>
+          </div>
         </Section>
 
         {/* Paths Section */}
@@ -224,12 +248,12 @@ export default function SettingsView() {
             }
           />
           <Field
-            label="Software Docs Directory"
-            value={draft.paths.software_docs_dir}
+            label="Software Profiles Directory"
+            value={draft.paths.software_profiles_dir}
             onChange={(v) =>
               setDraft({
                 ...draft,
-                paths: { ...draft.paths, software_docs_dir: v },
+                paths: { ...draft.paths, software_profiles_dir: v },
               })
             }
           />
