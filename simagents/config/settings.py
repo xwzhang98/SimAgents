@@ -12,7 +12,7 @@ from pydantic_settings import BaseSettings
 
 class LLMSettings(BaseModel):
     provider: str = "openai"
-    model: str = "gpt-4o"
+    model: str = "gpt-5.4-mini"
     temperature: float = 0.01
 
     @field_validator("temperature")

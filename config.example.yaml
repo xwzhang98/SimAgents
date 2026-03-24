@@ -3,7 +3,7 @@
 
 llm:
   provider: "openai"              # "openai" | "anthropic" | "google" | "ollama"
-  model: "gpt-4o"                 # Model name for your provider
+  model: "gpt-5.4-mini"           # Default: fast+cheap. Use "gpt-5.4" for difficult papers
   temperature: 0.01               # Low temperature for reproducibility
 
 rag:
