@@ -20,7 +20,7 @@ extraction:
 
 paths:
   output_dir: "./output"
-  software_docs_dir: "./data/software_docs"
+  software_profiles_dir: "./data/software_profiles"
 
 # Optional: SLURM settings for HPC users
 # slurm:

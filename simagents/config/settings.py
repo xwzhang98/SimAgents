@@ -39,7 +39,7 @@ class ExtractionSettings(BaseModel):
 
 class PathSettings(BaseModel):
     output_dir: str = "./output"
-    software_docs_dir: str = "./data/software_docs"
+    software_profiles_dir: str = "./data/software_profiles"
 
 
 class SLURMSettings(BaseModel):

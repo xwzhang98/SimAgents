@@ -17,9 +17,9 @@ class ExtractionInput(TypedDict, total=False):
 
 class ExtractionOutput(TypedDict):
     """Output contract for the extraction graph."""
-    genic_parameters: dict
-    gadget_parameters: dict
-    status: str  # "complete" | "incomplete"
+    sections: dict[str, dict]       # {"params": {...}} or {"genic": {...}, "gadget": {...}}
+    ic_notes: list[str]             # IC-relevant params when ic_generator is external
+    status: str                     # "complete" | "incomplete"
     missing: list[str]
     comment: str
     sources: list[dict]  # [{param, value, location, page}]

@@ -25,8 +25,8 @@ def test_extraction_input_chat_mode():
 
 def test_extraction_output_complete():
     out: ExtractionOutput = {
-        "genic_parameters": {"BoxSize": 100000},
-        "gadget_parameters": {"Omega0": 0.3},
+        "sections": {"genic": {"BoxSize": 100000}, "gadget": {"Omega0": 0.3}},
+        "ic_notes": [],
         "status": "complete",
         "missing": [],
         "comment": "All parameters found.",
@@ -34,12 +34,13 @@ def test_extraction_output_complete():
     }
     assert out["status"] == "complete"
     assert len(out["missing"]) == 0
+    assert "genic" in out["sections"]
 
 
 def test_extraction_output_incomplete():
     out: ExtractionOutput = {
-        "genic_parameters": {"BoxSize": 100000},
-        "gadget_parameters": {},
+        "sections": {"params": {"BoxSize": 100000}},
+        "ic_notes": ["Use MUSIC to generate ICs"],
         "status": "incomplete",
         "missing": ["Omega0", "HubbleParam"],
         "comment": "Could not find all parameters.",
@@ -47,3 +48,4 @@ def test_extraction_output_incomplete():
     }
     assert out["status"] == "incomplete"
     assert "Omega0" in out["missing"]
+    assert len(out["ic_notes"]) == 1
