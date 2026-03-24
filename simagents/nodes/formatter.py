@@ -12,7 +12,18 @@ _PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "formatter.md"
 
 def _load_prompt(target_software: str, raw_parameters: str) -> str:
     template = _PROMPT_PATH.read_text(encoding="utf-8")
-    return template.format(target_software=target_software, raw_parameters=raw_parameters)
+    # Build default values for all template variables
+    # Full profile-driven rendering will be added in the node update task
+    return template.format(
+        software_name=target_software,
+        software_description=f"{target_software} simulation software",
+        sections_spec="genic, gadget" if "gadget" in target_software.lower() else "params",
+        parameter_names_table="(see documentation)",
+        units_info="See documentation for unit conventions.",
+        ic_info="See documentation for IC generation.",
+        raw_parameters=raw_parameters,
+        output_example='{\n  "sections": {"params": {"param": "value"}},\n  "comment": "...",\n  "sources": [],\n  "status": "complete|incomplete|needs_user_input",\n  "missing_parameters": [],\n  "user_questions": []\n}',
+    )
 
 
 def _extract_json(text: str) -> dict:

@@ -8,9 +8,14 @@ from simagents.graph.state import ExtractionState
 _PROMPT_PATH = Path(__file__).parent.parent / "prompts" / "physics_expert.md"
 
 
-def _load_prompt(target_software: str, input_context: str, custom_prompt: str | None) -> str:
+def _load_prompt(target_software: str, input_context: str, custom_prompt: str | None, family_hint: str = "") -> str:
     template = _PROMPT_PATH.read_text(encoding="utf-8")
-    return template.format(target_software=target_software, input_context=input_context, custom_prompt=custom_prompt or "")
+    return template.format(
+        target_software=target_software,
+        input_context=input_context,
+        custom_prompt=custom_prompt or "",
+        family_hint=family_hint,
+    )
 
 
 def _build_input_context(state: ExtractionState) -> str:
