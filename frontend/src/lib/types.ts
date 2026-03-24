@@ -1,6 +1,6 @@
 export interface Message {
   type: "agent_message" | "status" | "needs_input" | "complete" | "error" | "user";
-  role?: "physics_expert" | "formatter" | "user" | "system";
+  role?: "physics_expert" | "formatter" | "estimator" | "user" | "system";
   content?: string;
   questions?: string[];
   missing?: string[];
@@ -32,11 +32,22 @@ export interface ProfileDetail extends ProfileInfo {
   parameter_names: Record<string, string>;
 }
 
+export interface ResourceEstimates {
+  memory_per_node_gb: number;
+  total_cpu_hours: number;
+  wall_clock: string;
+  storage_tb: number;
+  recommended_nodes: number;
+  confidence: string;
+  reference_simulation: string;
+  reasoning: string;
+}
+
 export interface SSEEvent {
   type: string;
   role?: string;
   content?: string;
-  data?: ParametersData;
+  data?: ParametersData | ResourceEstimates;
   questions?: string[];
   missing?: string[];
   status?: string;

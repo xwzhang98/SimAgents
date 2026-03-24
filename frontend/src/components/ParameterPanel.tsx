@@ -1,37 +1,38 @@
 "use client";
 
 import { useState, useCallback, useMemo } from "react";
-import type { ParametersData } from "@/lib/types";
+import type { ParametersData, ResourceEstimates } from "@/lib/types";
 import { updateParameters, getExportUrl } from "@/lib/api";
 
 interface ParameterPanelProps {
   parameters: ParametersData | null;
   sessionId: string | null;
+  resourceEstimates?: ResourceEstimates | null;
 }
 
-export default function ParameterPanel({ parameters, sessionId }: ParameterPanelProps) {
+export default function ParameterPanel({ parameters, sessionId, resourceEstimates }: ParameterPanelProps) {
   const [tab, setTab] = useState<string>("");
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState<Record<string, unknown>>({});
 
-  // Dynamic tabs from sections keys + "sources"
+  // Dynamic tabs from sections keys + "sources" + "estimates"
   const tabs = useMemo(() => {
-    if (!parameters) return [];
+    if (!parameters) return ["estimates"];
     const sectionKeys = Object.keys(parameters.sections || {});
-    return [...sectionKeys, "sources"];
+    return [...sectionKeys, "sources", "estimates"];
   }, [parameters]);
 
   // Auto-select first tab when tabs change
   const activeTab = tabs.includes(tab) ? tab : (tabs[0] || "");
 
   const handleEdit = () => {
-    if (!parameters || activeTab === "sources") return;
+    if (!parameters || activeTab === "sources" || activeTab === "estimates") return;
     setEditMode(true);
     setEditData({ ...(parameters.sections[activeTab] || {}) });
   };
 
   const handleSave = useCallback(async () => {
-    if (!sessionId || !parameters || activeTab === "sources") return;
+    if (!sessionId || !parameters || activeTab === "sources" || activeTab === "estimates") return;
     try {
       await updateParameters(sessionId, {
         sections: { [activeTab]: editData as Record<string, unknown> },
@@ -53,7 +54,7 @@ export default function ParameterPanel({ parameters, sessionId }: ParameterPanel
   };
 
   const currentParams =
-    activeTab !== "sources" ? parameters?.sections[activeTab] : null;
+    activeTab !== "sources" && activeTab !== "estimates" ? parameters?.sections[activeTab] : null;
 
   const missingSet = new Set(parameters?.missing || []);
 
@@ -63,7 +64,7 @@ export default function ParameterPanel({ parameters, sessionId }: ParameterPanel
       <div className="flex items-center justify-between border-b border-[#1a1a2e] px-4 py-4">
         <h3 className="text-sm font-semibold text-[#e2e8f0]">Parameters</h3>
         <div className="flex items-center gap-2">
-          {!editMode && activeTab !== "sources" && (
+          {!editMode && activeTab !== "sources" && activeTab !== "estimates" && (
             <button
               onClick={handleEdit}
               disabled={!parameters}
@@ -124,14 +125,16 @@ export default function ParameterPanel({ parameters, sessionId }: ParameterPanel
                 : "text-[#666] hover:text-[#9ca3af]"
             }`}
           >
-            {t === "sources" ? "Sources" : t.charAt(0).toUpperCase() + t.slice(1)}
+            {t === "sources" ? "Sources" : t === "estimates" ? "Estimates" : t.charAt(0).toUpperCase() + t.slice(1)}
           </button>
         ))}
       </div>
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-4 py-3">
-        {!parameters ? (
+        {activeTab === "estimates" ? (
+          <EstimatesTab estimates={resourceEstimates ?? null} />
+        ) : !parameters ? (
           <div className="flex h-full items-center justify-center">
             <p className="text-sm text-[#666]">
               No parameters yet. Upload a paper to start extraction.
@@ -234,6 +237,71 @@ function ParamTable({
           )}
         </div>
       ))}
+    </div>
+  );
+}
+
+function EstimatesTab({ estimates }: { estimates: ResourceEstimates | null }) {
+  if (!estimates) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <p className="text-sm text-[#666]">
+          Complete the extraction to get resource estimates.
+        </p>
+      </div>
+    );
+  }
+
+  const confidenceColor =
+    estimates.confidence === "high"
+      ? "#4ade80"
+      : estimates.confidence === "medium"
+        ? "#f59e0b"
+        : "#ff6b6b";
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-lg bg-[#1a1a2e] px-4 py-3 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#9ca3af]">Memory / node</span>
+          <span className="text-xs font-mono text-[#4ade80]">{estimates.memory_per_node_gb} GB/node</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#9ca3af]">CPU-hours</span>
+          <span className="text-xs font-mono text-[#4ade80]">{estimates.total_cpu_hours.toLocaleString()}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#9ca3af]">Wall-clock</span>
+          <span className="text-xs font-mono text-[#4ade80]">{estimates.wall_clock}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#9ca3af]">Storage</span>
+          <span className="text-xs font-mono text-[#4ade80]">{estimates.storage_tb} TB</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#9ca3af]">Recommended nodes</span>
+          <span className="text-xs font-mono text-[#4ade80]">{estimates.recommended_nodes}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#9ca3af]">Confidence</span>
+          <span
+            className="text-xs font-medium px-2 py-0.5 rounded-full"
+            style={{ color: confidenceColor, backgroundColor: `${confidenceColor}20` }}
+          >
+            {estimates.confidence}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-[#9ca3af]">Reference</span>
+          <span className="text-xs font-mono text-[#a78bfa]">{estimates.reference_simulation}</span>
+        </div>
+      </div>
+      {estimates.reasoning && (
+        <div className="rounded-lg bg-[#0d1a1a] border border-[#0d9488]/30 px-4 py-3">
+          <p className="text-xs text-[#9ca3af] mb-1 font-medium" style={{ color: "#0d9488" }}>Reasoning</p>
+          <p className="text-xs text-[#e2e8f0]">{estimates.reasoning}</p>
+        </div>
+      )}
     </div>
   );
 }

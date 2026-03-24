@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import type { View, Message, ParametersData, SSEEvent } from "@/lib/types";
+import type { View, Message, ParametersData, SSEEvent, ResourceEstimates } from "@/lib/types";
 import {
   uploadFile,
   startExtraction,
@@ -20,6 +20,7 @@ export default function Home() {
   const [view, setView] = useState<View>("chat");
   const [messages, setMessages] = useState<Message[]>([]);
   const [parameters, setParameters] = useState<ParametersData | null>(null);
+  const [resourceEstimates, setResourceEstimates] = useState<ResourceEstimates | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [waitingForInput, setWaitingForInput] = useState(false);
@@ -83,7 +84,12 @@ export default function Home() {
           break;
         case "parameters_update":
           if (event.data) {
-            setParameters(event.data);
+            setParameters(event.data as ParametersData);
+          }
+          break;
+        case "resource_estimates":
+          if (event.data) {
+            setResourceEstimates(event.data as ResourceEstimates);
           }
           break;
         case "complete":
@@ -261,6 +267,7 @@ export default function Home() {
             <ParameterPanel
               parameters={parameters}
               sessionId={sessionId}
+              resourceEstimates={resourceEstimates}
             />
           </div>
         </div>
