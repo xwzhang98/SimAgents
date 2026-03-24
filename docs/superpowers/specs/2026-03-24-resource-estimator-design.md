@@ -116,11 +116,15 @@ Extracts from the parameter sections:
 - `z_start`: from starting redshift
 - `n_snapshots`: from output list length or estimate
 
+Uses `target_software` to select software-specific scaling factors (e.g., SWIFT has different memory overhead than Gadget due to task-based architecture; Arepo's moving mesh has different compute scaling than SPH). Falls back to generic N-body/hydro scaling if no software-specific model exists.
+
 Applies scaling formulas from the database to produce initial estimates.
 
 ### Estimator prompt: `simagents/prompts/estimator.md`
 
 Template variables: `{parameters}`, `{heuristic_estimates}`, `{resource_database}`, `{target_software}`
+
+**Templating:** Uses Python `.format()`. Literal JSON braces in the output format section MUST be escaped as `{{` and `}}`.
 
 ```
 You are an expert in HPC resource estimation for cosmological simulations.
@@ -163,32 +167,48 @@ Respond with ONLY this JSON:
 
 ### Current graph:
 ```
-parse_input → physics_expert → formatter → check_done → save_output → END
-                                              ↑
-                                         loop/ask_user
+parse_input → physics_expert → formatter ─[check_done]─→ save_output → END
+                                    ↑          |
+                                    ├── loop ──┘
+                                    └── ask_user
 ```
+
+Note: `check_done` is a **conditional edge routing function**, not a node. It routes the formatter's output to `save_output` (when complete OR max iterations reached), `physics_expert` (loop), or `ask_user`.
 
 ### New graph:
 ```
-parse_input → physics_expert → formatter → check_done → save_output → estimator → END
-                                              ↑
-                                         loop/ask_user
+parse_input → physics_expert → formatter ─[check_done]─→ save_output ─[should_estimate]─→ estimator → END
+                                    ↑          |                              |
+                                    ├── loop ──┘                              └─→ END (skip)
+                                    └── ask_user
 ```
-
-The conditional edge from `check_done` still routes to `save_output` when "done". After `save_output`, the graph proceeds to `estimator`, then END.
 
 ### Skip condition
 
-The estimator should only run when extraction completed successfully. If `save_output` returns `status: "incomplete"`, the estimator should be skipped. This is implemented as a conditional edge after `save_output`:
+`save_output` echoes the state's `status` field — it does NOT set it to "complete". When the formatter sets `status: "complete"`, save_output passes that through. When max iterations are reached with `status: "incomplete"`, save_output also passes that through.
+
+The estimator should run for **both** complete and incomplete extractions — even partial parameters are useful for resource estimation (e.g., if box size and particle count are known but some cosmology params are missing, memory and storage can still be estimated). The estimator only skips when there are NO extracted parameters at all.
 
 ```python
 def should_estimate(state):
-    if state.get("status") == "complete":
+    sections = state.get("formatted_parameters", {}).get("sections", {})
+    has_params = any(bool(v) for v in sections.values())
+    if has_params:
         return "estimate"
     return "end"
 
 graph.add_conditional_edges("save_output", should_estimate, {"estimate": "estimator", "end": END})
 ```
+
+### SSE event ordering
+
+Currently `_stream_events` emits `{"type": "complete"}` from the `save_output` handler. With the estimator, the ordering changes:
+
+1. `save_output` event → emit `parameters_update` (final params) but **NOT** `"complete"` yet
+2. `estimator` event → emit `resource_estimates` event + `agent_message` for reasoning
+3. After the `astream()` generator ends → emit `{"type": "complete"}`
+
+The `"complete"` event is moved to the end of the stream (after all nodes finish) rather than being tied to `save_output`.
 
 ---
 
@@ -199,9 +219,23 @@ graph.add_conditional_edges("save_output", should_estimate, {"estimate": "estima
 resource_estimates: dict  # Populated by estimator node
 ```
 
+Default in initial state (in `_build_graph_and_config` and `main.py`): `"resource_estimates": {}`
+
 ### `ExtractionOutput` — add field:
 ```python
-resource_estimates: dict  # memory, cpu_hours, wall_clock, storage, nodes, confidence, reasoning
+class ResourceEstimates(TypedDict):
+    memory_per_node_gb: float
+    total_cpu_hours: int
+    wall_clock: str
+    storage_tb: float
+    recommended_nodes: int
+    confidence: str
+    reference_simulation: str
+    reasoning: str
+
+class ExtractionOutput(TypedDict):
+    ...
+    resource_estimates: ResourceEstimates  # typed, not bare dict
 ```
 
 ---
@@ -265,6 +299,20 @@ The estimator posts a message styled with a new role color (e.g., teal for estim
 | **Modify** | `frontend/src/components/ParameterPanel.tsx` — add Estimates tab |
 | **Modify** | `frontend/src/app/page.tsx` — handle resource_estimates SSE event |
 | **Modify** | `main.py` — print estimates after extraction |
+
+---
+
+## 8. Error Handling & Configuration
+
+### Estimator failures are non-fatal
+
+If the estimator LLM call fails (timeout, malformed JSON, API error), the extraction output is already saved. The estimator catches the error, emits an SSE error event (`{"type": "error", "message": "Resource estimation failed: ..."}`), sets `resource_estimates: {}`, and proceeds to END. The extraction is NOT rolled back.
+
+### Opt-in configuration
+
+Add `run_estimator: bool = True` to `ExtractionSettings`. When `False`, the `should_estimate` function always returns `"end"`, skipping the estimator node entirely. Users who want fast extraction without the extra LLM call can set this in `config.yaml`.
+
+---
 
 ### What does NOT change
 - Profile system
