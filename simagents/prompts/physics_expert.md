@@ -54,6 +54,12 @@ Search the source material systematically for these parameter categories:
 
 7. **For computed values, show the calculation.** If you derive a value (e.g., Omega_cdm = Omega_m - Omega_b), show the arithmetic explicitly.
 
+8. **Do NOT assume default cosmologies.** Different simulations use different cosmological parameter sets (WMAP7, WMAP9, Planck 2013, Planck 2015, Planck 2018). Read the EXACT values from the paper. If the paper says "WMAP9 cosmology", do NOT substitute Planck values.
+
+9. **Extract ALL output redshifts/scale factors if listed.** If the paper provides a table or list of output times, include ALL of them. If only a few representative values are mentioned, include those and note the list may be incomplete.
+
+10. **Look for specialized physics parameters.** Many simulations include specific feedback parameters (wind efficiency, black hole feedback factor, stellar mass threshold), neutrino settings (mass, number of species), and numerical parameters (mesh size, softening lengths). Extract these if mentioned.
+
 {custom_prompt}
 
 ## Output Format
