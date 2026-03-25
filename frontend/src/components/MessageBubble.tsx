@@ -22,13 +22,6 @@ function getRoleConfig(role?: string) {
         avatarBg: "#2a1e3a",
         avatarText: "FM",
       };
-    case "extractor":
-      return {
-        label: "Parameter Extractor",
-        labelColor: "#38bdf8",
-        avatarBg: "#1e2a3a",
-        avatarText: "EX",
-      };
     case "estimator":
       return {
         label: "Resource Estimator",

@@ -171,8 +171,12 @@ def formatter(state: ExtractionState, config: RunnableConfig) -> dict:
                 "messages": [response],
             }
 
-    # Compute IC notes deterministically
+    # Post-processing: code-based validation and auto-correction
     sections = parsed.get("sections", {})
+    sections = _auto_correct(sections)
+    parsed["sections"] = sections
+
+    # Compute IC notes deterministically
     ic_notes = _compute_ic_notes(profile, sections)
     if ic_notes:
         parsed["ic_notes"] = ic_notes
@@ -184,3 +188,56 @@ def formatter(state: ExtractionState, config: RunnableConfig) -> dict:
         "user_questions": parsed.get("user_questions", []),
         "messages": [response],
     }
+
+
+def _auto_correct(sections: dict) -> dict:
+    """Code-based auto-correction of common LLM errors. No LLM calls."""
+    all_params = {}
+    for sec_params in sections.values():
+        if isinstance(sec_params, dict):
+            all_params.update(sec_params)
+
+    # Fix Omega swap: if Omega0 > 0.5 and OmegaLambda < 0.5, swap them
+    omega0_keys = ["Omega0", "Omega_cdm"]
+    omega_l_keys = ["OmegaLambda", "Omega_lambda"]
+
+    for sec_name, sec_params in sections.items():
+        if not isinstance(sec_params, dict):
+            continue
+
+        o0_key = next((k for k in omega0_keys if k in sec_params), None)
+        ol_key = next((k for k in omega_l_keys if k in sec_params), None)
+
+        if o0_key and ol_key:
+            o0 = _safe_float(sec_params[o0_key])
+            ol = _safe_float(sec_params[ol_key])
+            if o0 is not None and ol is not None and o0 > 0.5 and ol < 0.5:
+                # Swap them
+                sec_params[o0_key], sec_params[ol_key] = sec_params[ol_key], sec_params[o0_key]
+
+    # Fix Ngrid: if > 50000, likely N³ instead of N — try cube root
+    for sec_name, sec_params in sections.items():
+        if not isinstance(sec_params, dict):
+            continue
+        for key in ["Ngrid", "GridSize", "Nmesh"]:
+            if key in sec_params:
+                val = _safe_float(sec_params[key])
+                if val is not None and val > 50000:
+                    import math
+                    cube_root = round(val ** (1/3))
+                    if abs(cube_root ** 3 - val) < val * 0.01:
+                        sec_params[key] = cube_root
+
+    # Remove None values
+    for sec_name, sec_params in sections.items():
+        if isinstance(sec_params, dict):
+            sections[sec_name] = {k: v for k, v in sec_params.items() if v is not None}
+
+    return sections
+
+
+def _safe_float(val) -> float | None:
+    try:
+        return float(val)
+    except (ValueError, TypeError):
+        return None

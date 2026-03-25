@@ -179,31 +179,40 @@ def structured_extract(state: ExtractionState, config: RunnableConfig) -> dict:
 
     user_msg = f"## Source Material\n\n{context}\n\nExtract all simulation parameters from the source material above and format them for the target software."
 
-    # Use structured output for guaranteed valid JSON
-    structured_llm = llm.with_structured_output(ExtractionResult)
-
     messages = [
         SystemMessage(content=system_prompt),
         HumanMessage(content=user_msg),
     ]
 
+    # Use regular invoke + JSON parse (more reliable across models than structured_output
+    # which struggles with deeply nested dict[str, dict[str, Any]] schemas)
+    from simagents.nodes.formatter import _extract_json
+
+    response = llm.invoke(messages)
+
     try:
-        result: ExtractionResult = structured_llm.invoke(messages)
+        parsed = _extract_json(response.content)
+        result = ExtractionResult(**parsed)
     except Exception as e:
-        # Fallback: try without structured output
-        response = llm.invoke(messages)
-        return {
-            "formatted_parameters": {
-                "sections": {},
-                "comment": f"Structured output failed: {e}. Raw: {response.content[:500]}",
-                "sources": [],
-                "ic_notes": [],
-            },
-            "status": "incomplete",
-            "missing_parameters": ["STRUCTURED_OUTPUT_FAILED"],
-            "iteration": state.get("iteration", 0) + 1,
-            "messages": [messages[1], response],
-        }
+        # Retry once with explicit JSON instruction
+        retry_msg = HumanMessage(content="Your response was not valid JSON. Please respond with ONLY the JSON object matching the schema: {sections: {section_name: {param: value}}, comment: str, sources: [...], status: str, missing_parameters: [...], user_questions: [...]}")
+        response = llm.invoke(messages + [response, retry_msg])
+        try:
+            parsed = _extract_json(response.content)
+            result = ExtractionResult(**parsed)
+        except Exception as e2:
+            return {
+                "formatted_parameters": {
+                    "sections": {},
+                    "comment": f"JSON parse failed: {e2}. Raw: {response.content[:500]}",
+                    "sources": [],
+                    "ic_notes": [],
+                },
+                "status": "incomplete",
+                "missing_parameters": ["JSON_PARSE_FAILED"],
+                "iteration": state.get("iteration", 0) + 1,
+                "messages": [messages[1], response],
+            }
 
     # Convert Pydantic model to dict for state
     sections = result.sections

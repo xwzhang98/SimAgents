@@ -142,14 +142,17 @@ async def _stream_events(session) -> AsyncGenerator[dict, None]:
         async for event in session.graph.astream(input_val, config=session.config):
             if "parse_input" in event:
                 yield {"event": "message", "data": json.dumps({"type": "status", "message": f"Mode: {event['parse_input'].get('input_mode', 'unknown')}"})}
-            elif "structured_extract" in event:
-                data = event["structured_extract"]
-                fmt = data.get("formatted_parameters", {})
-                # Show extraction result as agent message
-                msg = {"type": "agent_message", "role": "extractor", "content": fmt.get("comment", "Extracting parameters...")}
+            elif "physics_expert" in event:
+                data = event["physics_expert"]
+                msg = {"type": "agent_message", "role": "physics_expert", "content": data.get("raw_parameters", "")}
                 session.messages.append(msg)
                 yield {"event": "message", "data": json.dumps(msg)}
-                # Update parameters
+            elif "formatter" in event:
+                data = event["formatter"]
+                fmt = data.get("formatted_parameters", {})
+                msg = {"type": "agent_message", "role": "formatter", "content": fmt.get("comment", "")}
+                session.messages.append(msg)
+                yield {"event": "message", "data": json.dumps(msg)}
                 params = {
                     "sections": fmt.get("sections", {}),
                     "ic_notes": fmt.get("ic_notes", []),

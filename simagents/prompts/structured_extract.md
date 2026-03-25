@@ -61,3 +61,29 @@ Convert units as needed:
 15. **Seed:** If stated in the paper, use it. Otherwise use 12345 as default.
 
 {custom_prompt}
+
+## Output Format
+Respond with ONLY this JSON (no other text before or after):
+
+```json
+{{
+  "sections": {{
+    "genic": {{
+      "BoxSize": 100000.0,
+      "Ngrid": 64,
+      "Omega0": 0.3089
+    }},
+    "gadget": {{
+      "Omega0": 0.3089,
+      "OutputList": "0.3333,1.0"
+    }}
+  }},
+  "comment": "Brief explanation of extraction",
+  "sources": [{{"param": "BoxSize", "value": 100000, "location": "Table 1", "page": 5}}],
+  "status": "complete",
+  "missing_parameters": [],
+  "user_questions": []
+}}
+```
+
+Use the EXACT section names from "Output Sections" above. Include ALL extracted parameters in the appropriate section.
