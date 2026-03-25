@@ -176,10 +176,14 @@ async def _stream_events(session) -> AsyncGenerator[dict, None]:
                     msg = {"type": "agent_message", "role": "estimator", "content": reasoning}
                     session.messages.append(msg)
                     yield {"event": "message", "data": json.dumps(msg)}
-        session.status = "complete"
-        yield {"event": "message", "data": json.dumps({"type": "complete", "status": "complete"})}
+        # Only emit "complete" if the graph finished normally (not interrupted for user input)
+        if session.status != "waiting_input":
+            session.status = "complete"
+            yield {"event": "message", "data": json.dumps({"type": "complete", "status": "complete"})}
+        # If waiting_input, the stream ends naturally — frontend shows the HITL question
     except Exception as e:
-        session.status = "complete"
+        if session.status != "waiting_input":
+            session.status = "complete"
         yield {"event": "message", "data": json.dumps({"type": "error", "message": str(e)})}
 
 
