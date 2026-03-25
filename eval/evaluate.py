@@ -123,8 +123,20 @@ def _values_match(extracted, golden, tolerance=0.01) -> bool:
     except (ValueError, TypeError):
         pass
 
+    # For comma-separated lists (OutputList), compare element by element
+    e_str = str(extracted).strip()
+    g_str = str(golden).strip()
+    if "," in e_str and "," in g_str:
+        try:
+            e_vals = [float(x.strip()) for x in e_str.split(",")]
+            g_vals = [float(x.strip()) for x in g_str.split(",")]
+            if len(e_vals) == len(g_vals):
+                return all(abs(a - b) < tolerance for a, b in zip(e_vals, g_vals))
+        except ValueError:
+            pass
+
     # String comparison (case-insensitive, strip whitespace)
-    return str(extracted).strip().lower() == str(golden).strip().lower()
+    return e_str.lower() == g_str.lower()
 
 
 def run_single_extraction(

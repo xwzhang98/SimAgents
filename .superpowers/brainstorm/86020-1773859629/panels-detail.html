@@ -1,0 +1,175 @@
+<h2>The Three-Panel Layout</h2>
+<p class="subtitle">How each panel works in the daily workflow</p>
+
+<div class="mockup">
+  <div class="mockup-header">SimAgents — Full Layout</div>
+  <div class="mockup-body" style="padding:0;height:420px;display:flex;background:#0f0f1a;">
+
+    <!-- Sidebar -->
+    <div style="width:60px;background:#12122a;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:6px;border-right:1px solid #1e1e3a;">
+      <div style="width:36px;height:36px;background:#7c3aed;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:8px;">S</div>
+      <div style="width:36px;height:36px;background:#1e1e3a;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;border:2px solid #7c3aed;" title="Chat">💬</div>
+      <div style="width:36px;height:36px;background:transparent;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;opacity:0.5;" title="Parameters">📄</div>
+      <div style="width:36px;height:36px;background:transparent;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;opacity:0.5;" title="Settings">⚙️</div>
+      <div style="flex:1;"></div>
+      <div style="width:36px;height:36px;background:transparent;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;opacity:0.5;" title="Help">❓</div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div style="flex:3;display:flex;flex-direction:column;border-right:1px solid #1e1e3a;">
+      <!-- Header -->
+      <div style="padding:12px 16px;border-bottom:1px solid #1e1e3a;display:flex;align-items:center;gap:8px;">
+        <span style="color:#e2e8f0;font-size:13px;font-weight:600;">Extraction Chat</span>
+        <span style="background:#1e3a2e;color:#4ade80;font-size:10px;padding:2px 8px;border-radius:10px;">Running</span>
+      </div>
+
+      <!-- Messages -->
+      <div style="flex:1;padding:16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;">
+        <!-- System -->
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:28px;height:28px;background:#1e3a5a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;">🔬</div>
+          <div style="background:#1a1a2e;border-radius:8px;padding:10px;max-width:80%;">
+            <div style="font-size:10px;color:#7c3aed;font-weight:600;margin-bottom:4px;">Physics Expert</div>
+            <div style="font-size:12px;color:#c4c4d4;line-height:1.5;">Found 7 parameters in paper. BoxSize = 100 Mpc/h (Table 2, p.5), Omega_m = 0.3089 (Section 2.1)...</div>
+          </div>
+        </div>
+
+        <!-- Formatter -->
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:28px;height:28px;background:#2a1e3a;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;">📋</div>
+          <div style="background:#1a1a2e;border-radius:8px;padding:10px;max-width:80%;">
+            <div style="font-size:10px;color:#a78bfa;font-weight:600;margin-bottom:4px;">Formatter</div>
+            <div style="font-size:12px;color:#c4c4d4;line-height:1.5;">Validated against MP-Gadget docs. Converted BoxSize to 100000 kpc/h. 2 required parameters missing.</div>
+          </div>
+        </div>
+
+        <!-- HITL Question - highlighted -->
+        <div style="display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:28px;height:28px;background:#3a2e1e;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;">⚠️</div>
+          <div style="background:#1a1a2e;border:1px solid #f59e0b;border-radius:8px;padding:10px;max-width:80%;">
+            <div style="font-size:10px;color:#f59e0b;font-weight:600;margin-bottom:4px;">Input Required</div>
+            <div style="font-size:12px;color:#c4c4d4;line-height:1.5;margin-bottom:8px;">Could not find <b>Seed</b> (random seed for IC generation) in the paper. What value would you like to use?</div>
+            <div style="display:flex;gap:6px;">
+              <input style="flex:1;background:#0d1117;border:1px solid #374151;border-radius:6px;padding:6px 10px;color:#e2e8f0;font-size:12px;" placeholder="Enter value..." value="42">
+              <button style="background:#7c3aed;color:white;border:none;border-radius:6px;padding:6px 14px;font-size:12px;cursor:pointer;">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- User message -->
+        <div style="display:flex;gap:8px;align-items:flex-start;justify-content:flex-end;">
+          <div style="background:#7c3aed;border-radius:8px;padding:10px;max-width:60%;">
+            <div style="font-size:12px;color:white;line-height:1.5;">Use Seed = 42</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input -->
+      <div style="padding:12px 16px;border-top:1px solid #1e1e3a;">
+        <div style="display:flex;gap:8px;">
+          <div style="background:#1a1a2e;border-radius:8px;padding:8px;cursor:pointer;display:flex;align-items:center;font-size:14px;" title="Upload PDF">📎</div>
+          <input style="flex:1;background:#1a1a2e;border:1px solid #2a2a4a;border-radius:8px;padding:8px 12px;color:#e2e8f0;font-size:12px;" placeholder="Type a message or drag a PDF here...">
+          <button style="background:#7c3aed;color:white;border:none;border-radius:8px;padding:8px 16px;font-size:12px;cursor:pointer;">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Parameters Panel -->
+    <div style="flex:2;display:flex;flex-direction:column;">
+      <!-- Header -->
+      <div style="padding:12px 16px;border-bottom:1px solid #1e1e3a;display:flex;align-items:center;justify-content:space-between;">
+        <span style="color:#e2e8f0;font-size:13px;font-weight:600;">Parameters</span>
+        <div style="display:flex;gap:4px;">
+          <button style="background:#1a1a2e;color:#a78bfa;border:1px solid #2a2a4a;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;">Edit</button>
+          <button style="background:#7c3aed;color:white;border:none;border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;">Export</button>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="padding:8px 16px;display:flex;gap:4px;border-bottom:1px solid #1e1e3a;">
+        <div style="background:#7c3aed;border-radius:6px;padding:4px 12px;font-size:11px;color:white;">GenIC</div>
+        <div style="background:#1a1a2e;border-radius:6px;padding:4px 12px;font-size:11px;color:#666;">Gadget</div>
+        <div style="background:#1a1a2e;border-radius:6px;padding:4px 12px;font-size:11px;color:#666;">Sources</div>
+      </div>
+
+      <!-- Params list -->
+      <div style="flex:1;padding:12px 16px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;">
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2e;">
+          <span style="font-size:12px;color:#9ca3af;">BoxSize</span>
+          <span style="font-size:12px;color:#4ade80;font-family:monospace;">100000</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2e;">
+          <span style="font-size:12px;color:#9ca3af;">Ngrid</span>
+          <span style="font-size:12px;color:#4ade80;font-family:monospace;">64</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2e;">
+          <span style="font-size:12px;color:#9ca3af;">Omega0</span>
+          <span style="font-size:12px;color:#4ade80;font-family:monospace;">0.2814</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2e;">
+          <span style="font-size:12px;color:#9ca3af;">OmegaLambda</span>
+          <span style="font-size:12px;color:#4ade80;font-family:monospace;">0.7186</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2e;">
+          <span style="font-size:12px;color:#9ca3af;">HubbleParam</span>
+          <span style="font-size:12px;color:#4ade80;font-family:monospace;">0.697</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2e;">
+          <span style="font-size:12px;color:#9ca3af;">Redshift</span>
+          <span style="font-size:12px;color:#4ade80;font-family:monospace;">99</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2e;">
+          <span style="font-size:12px;color:#9ca3af;">Seed</span>
+          <span style="font-size:12px;color:#4ade80;font-family:monospace;">42</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1a1a2e;">
+          <span style="font-size:12px;color:#ff6b6b;">ProduceGas</span>
+          <span style="font-size:12px;color:#ff6b6b;font-family:monospace;">missing</span>
+        </div>
+      </div>
+
+      <!-- Status bar -->
+      <div style="padding:10px 16px;border-top:1px solid #1e1e3a;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:8px;height:8px;background:#f59e0b;border-radius:50%;"></div>
+          <span style="font-size:11px;color:#9ca3af;">7/8 parameters found</span>
+        </div>
+        <span style="font-size:10px;color:#666;">Source: 2105.01016v2.pdf</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:24px;">
+  <h3>Panel Details</h3>
+  <div class="pros-cons">
+    <div class="pros">
+      <h4>Sidebar (left)</h4>
+      <ul>
+        <li>Chat view (default)</li>
+        <li>Parameters full-page view</li>
+        <li>Settings page</li>
+        <li>Help / about</li>
+      </ul>
+    </div>
+    <div class="pros">
+      <h4>Chat (center)</h4>
+      <ul>
+        <li>Agent messages with avatars</li>
+        <li>Highlighted HITL questions with inline input</li>
+        <li>Your messages (right-aligned)</li>
+        <li>PDF upload via button or drag-drop</li>
+      </ul>
+    </div>
+    <div class="pros">
+      <h4>Parameters (right)</h4>
+      <ul>
+        <li>Tabs: GenIC / Gadget / Sources</li>
+        <li>Live updates as agents extract</li>
+        <li>Edit mode for manual tweaks</li>
+        <li>Export to JSON</li>
+        <li>Status: complete / missing count</li>
+      </ul>
+    </div>
+  </div>
+</div>

@@ -40,15 +40,26 @@ IMPORTANT: If the extracted value uses different units than {software_name} expe
    - If both Omega_cdm and Omega_b are given: Omega_m = Omega_cdm + Omega_b
    - h should be between 0.5 and 1.0
    - sigma_8 should be between 0.5 and 1.2
+   - OmegaBaryon should ALWAYS be set to the cosmological value from the paper, even for dark-matter-only simulations. The baryon fraction is a cosmological parameter, not a physics switch.
 
 4. **For file paths and output directories:** Use placeholder values like "./output/" for OutputDir and "./ICs/" for IC file paths. These are user-configurable and should NOT be guessed from the paper.
 
-5. **OutputList format:** Use comma-separated scale factors (a = 1/(1+z)). If the paper gives redshifts, convert to scale factors.
+5. **OutputList format:** Use comma-separated scale factors (a = 1/(1+z)) rounded to 4 decimal places. If the paper gives redshifts, convert: a = 1/(1+z). Example: z=2 → a=0.3333, z=0 → a=1.0.
 
-6. **Set status carefully:**
-   - "complete": All cosmological parameters (Omega_m or Omega_cdm+Omega_b, Omega_Lambda, h) AND box size AND particle count are present
-   - "incomplete": Core cosmological parameters are missing
-   - "needs_user_input": Parameters that genuinely cannot be determined from the paper (e.g., random seed, specific file paths)
+6. **Physics module flags:** For dark-matter-only (DM-only) simulations, set ALL physics flags to 0:
+   - ProduceGas=0, CoolingOn=0, StarformationOn=0, BlackHoleOn=0, WindOn=0, MetalReturnOn=0, SnapshotWithFOF=0, DensityIndependentSphOn=0, MassiveNuLinRespOn=0
+   For hydrodynamic simulations, set the relevant flags to 1 based on what physics the paper describes.
+
+7. **WhichSpectrum:** Set to 2 (Eisenstein & Hu approximation) unless the paper explicitly states a file-based power spectrum, in which case set to 1.
+
+8. **Starting redshift:** Include in the genic section as "Redshift". Common values: 99, 127, 199. If not explicitly stated, check if the paper mentions initial conditions or starting redshift.
+
+9. **Random seed:** If stated in the paper, include it. If not stated, set to 12345 as a conventional default and note it in the comment.
+
+10. **Set status carefully:**
+    - "complete": All cosmological parameters (Omega_m, Omega_Lambda, h) AND box size AND particle count are present
+    - "incomplete": Core cosmological parameters are missing
+    - "needs_user_input": Parameters that genuinely cannot be determined from the paper
 
 ## Output Format
 Respond with ONLY this JSON (no other text):
