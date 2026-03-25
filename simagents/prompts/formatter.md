@@ -19,9 +19,19 @@ For parameters NOT in the table above, search the documentation to find the corr
 {units_info}
 
 IMPORTANT: If the extracted value uses different units than {software_name} expects, you MUST convert. Common conversions:
-- Mpc/h to kpc/h: multiply by 1000
+- Mpc/h to kpc/h: multiply by 1000 (e.g., 250 Mpc/h → 250000 kpc/h)
 - Mpc to kpc: multiply by 1000
+- h^-1 Mpc to kpc/h: multiply by 1000 (h^-1 Mpc is the SAME as Mpc/h)
 - H0 (km/s/Mpc) to h: divide by 100
+- cMpc to kpc: multiply by 1000 (comoving Mpc)
+
+**CRITICAL: Do NOT double box sizes.** If the paper says "250 Mpc/h box" or "250 h^-1 Mpc on a side", BoxSize = 250000 kpc/h. The box size is always the side length, not the diameter.
+
+**Particle count / Ngrid parsing:** Papers often write particle counts as "N³" or "2×N³". The Ngrid value is N (the cube root), NOT N³. For example:
+- "2 × 7040³" means Ngrid = 7040 (not 70403)
+- "1820³" means Ngrid = 1820
+- "2 × 2500³" means Ngrid = 2500
+If the extracted value seems unusually large (>10000), check if it's a parsing artifact of "N³" being read as a single number.
 
 ## IC Generator
 {ic_info}
@@ -43,8 +53,12 @@ IMPORTANT: If the extracted value uses different units than {software_name} expe
    - h should be between 0.5 and 1.0
    - sigma_8 should be between 0.5 and 1.2
    - OmegaBaryon should ALWAYS be set to the cosmological value from the paper, even for dark-matter-only simulations
-   - **CRITICAL: Omega0 (matter) is typically 0.25-0.32. OmegaLambda (dark energy) is typically 0.68-0.75. If Omega0 > 0.5, you likely swapped them — double-check!**
-   - **Omega_m is labeled as Omega_m, Omega_matter, Omega_0 in papers. Omega_Lambda is labeled as Omega_Lambda, Omega_DE, Omega_vacuum.**
+   - **CRITICAL — OMEGA VALIDATION:**
+     - Omega0 (total matter density) is ALWAYS between 0.2 and 0.4 in standard cosmology. Common values: 0.2814 (WMAP9), 0.3089 (Planck 2015), 0.3111 (Planck 2018).
+     - OmegaLambda (dark energy) is ALWAYS between 0.6 and 0.8. Common values: 0.7186, 0.6911, 0.6889.
+     - **If you are about to set Omega0 > 0.5 or OmegaLambda < 0.5, STOP — you have swapped them.**
+     - Omega_m / Omega_matter / Omega_0 → maps to Omega0 (the SMALLER value ~0.3)
+     - Omega_Lambda / Omega_DE → maps to OmegaLambda (the LARGER value ~0.7)
 
 4. **For file paths and output directories:** Use placeholder values like "./output/" for OutputDir and "./ICs/" for IC file paths. These are user-configurable and should NOT be guessed from the paper.
 

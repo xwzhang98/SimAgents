@@ -64,27 +64,18 @@ Search the source material systematically for these parameter categories:
 
 ## Output Format
 
-Respond with ONLY this JSON (no other text before or after):
+Respond with ONLY this JSON. Keep it concise — include only the MOST IMPORTANT simulation parameters (cosmology, box, resolution, ICs, output, physics flags). Do NOT include every sub-grid parameter or numerical detail.
 
 ```json
 {{
   "parameters": [
-    {{
-      "name": "parameter name (use canonical physics names)",
-      "value": "exact value as stated in paper",
-      "unit": "unit if applicable (e.g., Mpc/h, kpc/h, K)",
-      "source": "Table 1 / Section 2.1 / Eq. 3",
-      "confidence": "high|medium|low",
-      "notes": "any relevant context (e.g., calculated from X, Planck 2015 cosmology)"
-    }}
+    {{"name": "Omega_m", "value": 0.2814, "unit": "", "source": "Table 1", "confidence": "high", "notes": ""}},
+    {{"name": "box_size", "value": 400, "unit": "Mpc/h", "source": "Table 1", "confidence": "high", "notes": ""}}
   ],
-  "simulation_name": "name of the specific simulation run if identified",
-  "software_mentioned": "simulation software mentioned in the paper if any",
-  "not_found": ["list of parameters searched for but not found in the paper"]
+  "simulation_name": "name of simulation run",
+  "software_mentioned": "software if mentioned",
+  "not_found": ["params searched but not found"]
 }}
 ```
 
-Confidence levels:
-- **high**: Value explicitly stated in a table or clearly in text
-- **medium**: Value calculated from other stated values, or stated in running text (not a table)
-- **low**: Value inferred from context (e.g., "Planck cosmology" implies specific values)
+Use numeric values (not strings) where possible. Confidence: high = in table/explicit, medium = calculated/running text, low = inferred.
