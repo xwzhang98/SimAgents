@@ -55,11 +55,13 @@ def physics_expert(state: ExtractionState, config: RunnableConfig) -> dict:
     user_msg_parts = ["Please extract the simulation parameters from the provided source."]
     if paper_retriever and state.get("input_mode") in ("paper", "hybrid"):
         search_queries = [
-            "cosmological parameters Omega matter dark energy baryon",
-            "Hubble parameter h sigma8 spectral index",
-            "simulation box size Mpc resolution particle number Ngrid",
-            "initial conditions redshift power spectrum transfer function",
-            "simulation setup configuration parameters table",
+            "cosmological parameters Omega matter dark energy baryon Hubble",
+            "sigma8 sigma_8 power spectrum normalization spectral index n_s",
+            "simulation box size volume Mpc resolution particle number",
+            "initial conditions starting redshift power spectrum transfer function seed",
+            "simulation setup configuration parameters table summary",
+            "output redshift snapshots scale factor",
+            "cooling star formation black hole feedback wind neutrino",
         ]
         missing = state.get("missing_parameters", [])
         if missing:
