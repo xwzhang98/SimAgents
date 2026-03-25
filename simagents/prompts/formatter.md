@@ -39,6 +39,8 @@ If the extracted value seems unusually large (>10000), check if it's a parsing a
 ## Extracted Parameters (from physics expert)
 {raw_parameters}
 
+{validation_rules}
+
 ## CRITICAL RULES
 
 1. **Use ONLY values from the extracted parameters above.** Do NOT invent values. If a required parameter was not extracted, list it in missing_parameters. NEVER use null or None as a parameter value — if you don't have the value, omit the parameter entirely and list it in missing_parameters.
@@ -50,15 +52,7 @@ If the extracted value seems unusually large (>10000), check if it's a parsing a
 3. **Validate cosmological consistency:**
    - Omega_m + Omega_Lambda should be approximately 1.0 for a flat universe
    - If both Omega_cdm and Omega_b are given: Omega_m = Omega_cdm + Omega_b
-   - h should be between 0.5 and 1.0
-   - sigma_8 should be between 0.5 and 1.2
    - OmegaBaryon should ALWAYS be set to the cosmological value from the paper, even for dark-matter-only simulations
-   - **CRITICAL — OMEGA VALIDATION:**
-     - Omega0 (total matter density) is ALWAYS between 0.2 and 0.4 in standard cosmology. Common values: 0.2814 (WMAP9), 0.3089 (Planck 2015), 0.3111 (Planck 2018).
-     - OmegaLambda (dark energy) is ALWAYS between 0.6 and 0.8. Common values: 0.7186, 0.6911, 0.6889.
-     - **If you are about to set Omega0 > 0.5 or OmegaLambda < 0.5, STOP — you have swapped them.**
-     - Omega_m / Omega_matter / Omega_0 → maps to Omega0 (the SMALLER value ~0.3)
-     - Omega_Lambda / Omega_DE → maps to OmegaLambda (the LARGER value ~0.7)
 
 4. **For file paths and output directories:** Use placeholder values like "./output/" for OutputDir and "./ICs/" for IC file paths. These are user-configurable and should NOT be guessed from the paper.
 

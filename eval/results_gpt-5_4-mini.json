@@ -3,14 +3,14 @@
     "simulation": "dmo-100MPC-64",
     "paper": "/Users/zhangxiaowen/AntigravityProjects/SimAgents/golden_standard/papers/2105.01016v2.pdf",
     "model": "gpt-5.4-mini",
-    "elapsed_seconds": 18.6,
+    "elapsed_seconds": 40.3,
     "score": {
       "total": 20,
-      "correct": 19,
-      "wrong": 1,
-      "missing": 0,
+      "correct": 18,
+      "wrong": 0,
+      "missing": 2,
       "extra": 11,
-      "accuracy": 0.95,
+      "accuracy": 0.9,
       "details": [
         {
           "param": "genic.BoxSize",
@@ -62,8 +62,139 @@
         },
         {
           "param": "genic.Redshift",
-          "status": "wrong",
-          "extracted": 49,
+          "status": "missing",
+          "golden": 99
+        },
+        {
+          "param": "genic.Seed",
+          "status": "correct",
+          "extracted": 12345,
+          "golden": 12345
+        },
+        {
+          "param": "gadget.OutputList",
+          "status": "missing",
+          "golden": "0.3333,1.0"
+        },
+        {
+          "param": "gadget.MetalReturnOn",
+          "status": "correct",
+          "extracted": 0,
+          "golden": 0
+        },
+        {
+          "param": "gadget.CoolingOn",
+          "status": "correct",
+          "extracted": 0,
+          "golden": 0
+        },
+        {
+          "param": "gadget.SnapshotWithFOF",
+          "status": "correct",
+          "extracted": 0,
+          "golden": 0
+        },
+        {
+          "param": "gadget.BlackHoleOn",
+          "status": "correct",
+          "extracted": 0,
+          "golden": 0
+        },
+        {
+          "param": "gadget.StarformationOn",
+          "status": "correct",
+          "extracted": 0,
+          "golden": 0
+        },
+        {
+          "param": "gadget.WindOn",
+          "status": "correct",
+          "extracted": 0,
+          "golden": 0
+        },
+        {
+          "param": "gadget.MassiveNuLinRespOn",
+          "status": "correct",
+          "extracted": 0,
+          "golden": 0
+        },
+        {
+          "param": "gadget.DensityIndependentSphOn",
+          "status": "correct",
+          "extracted": 0,
+          "golden": 0
+        },
+        {
+          "param": "gadget.Omega0",
+          "status": "correct",
+          "extracted": 0.2814,
+          "golden": 0.2814
+        }
+      ]
+    },
+    "status": "incomplete"
+  },
+  {
+    "simulation": "dmo-100MPC-512",
+    "paper": "/Users/zhangxiaowen/AntigravityProjects/SimAgents/golden_standard/papers/2105.01016v2.pdf",
+    "model": "gpt-5.4-mini",
+    "elapsed_seconds": 14.9,
+    "score": {
+      "total": 20,
+      "correct": 15,
+      "wrong": 1,
+      "missing": 4,
+      "extra": 8,
+      "accuracy": 0.75,
+      "details": [
+        {
+          "param": "genic.BoxSize",
+          "status": "correct",
+          "extracted": 100000,
+          "golden": 100000.0
+        },
+        {
+          "param": "genic.Ngrid",
+          "status": "correct",
+          "extracted": 512,
+          "golden": 512
+        },
+        {
+          "param": "genic.WhichSpectrum",
+          "status": "correct",
+          "extracted": 2,
+          "golden": 2
+        },
+        {
+          "param": "genic.Omega0",
+          "status": "missing",
+          "golden": 0.2814
+        },
+        {
+          "param": "genic.OmegaBaryon",
+          "status": "missing",
+          "golden": 0.0464
+        },
+        {
+          "param": "genic.OmegaLambda",
+          "status": "missing",
+          "golden": 0.7186
+        },
+        {
+          "param": "genic.HubbleParam",
+          "status": "missing",
+          "golden": 0.697
+        },
+        {
+          "param": "genic.ProduceGas",
+          "status": "correct",
+          "extracted": 0,
+          "golden": 0
+        },
+        {
+          "param": "genic.Redshift",
+          "status": "correct",
+          "extracted": 99,
           "golden": 99
         },
         {
@@ -128,8 +259,8 @@
         },
         {
           "param": "gadget.Omega0",
-          "status": "correct",
-          "extracted": 0.2814,
+          "status": "wrong",
+          "extracted": 0.3,
           "golden": 0.2814
         }
       ]
@@ -137,148 +268,17 @@
     "status": "needs_user_input"
   },
   {
-    "simulation": "dmo-100MPC-512",
-    "paper": "/Users/zhangxiaowen/AntigravityProjects/SimAgents/golden_standard/papers/2105.01016v2.pdf",
-    "model": "gpt-5.4-mini",
-    "elapsed_seconds": 22.1,
-    "score": {
-      "total": 20,
-      "correct": 14,
-      "wrong": 0,
-      "missing": 6,
-      "extra": 6,
-      "accuracy": 0.7,
-      "details": [
-        {
-          "param": "genic.BoxSize",
-          "status": "correct",
-          "extracted": 100000,
-          "golden": 100000.0
-        },
-        {
-          "param": "genic.Ngrid",
-          "status": "correct",
-          "extracted": 512,
-          "golden": 512
-        },
-        {
-          "param": "genic.WhichSpectrum",
-          "status": "correct",
-          "extracted": 2,
-          "golden": 2
-        },
-        {
-          "param": "genic.Omega0",
-          "status": "missing",
-          "golden": 0.2814
-        },
-        {
-          "param": "genic.OmegaBaryon",
-          "status": "missing",
-          "golden": 0.0464
-        },
-        {
-          "param": "genic.OmegaLambda",
-          "status": "missing",
-          "golden": 0.7186
-        },
-        {
-          "param": "genic.HubbleParam",
-          "status": "missing",
-          "golden": 0.697
-        },
-        {
-          "param": "genic.ProduceGas",
-          "status": "correct",
-          "extracted": 0,
-          "golden": 0
-        },
-        {
-          "param": "genic.Redshift",
-          "status": "correct",
-          "extracted": 99,
-          "golden": 99
-        },
-        {
-          "param": "genic.Seed",
-          "status": "correct",
-          "extracted": 12345,
-          "golden": 12345
-        },
-        {
-          "param": "gadget.OutputList",
-          "status": "missing",
-          "golden": "0.3333,1.0"
-        },
-        {
-          "param": "gadget.MetalReturnOn",
-          "status": "correct",
-          "extracted": 0,
-          "golden": 0
-        },
-        {
-          "param": "gadget.CoolingOn",
-          "status": "correct",
-          "extracted": 0,
-          "golden": 0
-        },
-        {
-          "param": "gadget.SnapshotWithFOF",
-          "status": "correct",
-          "extracted": 0,
-          "golden": 0
-        },
-        {
-          "param": "gadget.BlackHoleOn",
-          "status": "correct",
-          "extracted": 0,
-          "golden": 0
-        },
-        {
-          "param": "gadget.StarformationOn",
-          "status": "correct",
-          "extracted": 0,
-          "golden": 0
-        },
-        {
-          "param": "gadget.WindOn",
-          "status": "correct",
-          "extracted": 0,
-          "golden": 0
-        },
-        {
-          "param": "gadget.MassiveNuLinRespOn",
-          "status": "correct",
-          "extracted": 0,
-          "golden": 0
-        },
-        {
-          "param": "gadget.DensityIndependentSphOn",
-          "status": "correct",
-          "extracted": 0,
-          "golden": 0
-        },
-        {
-          "param": "gadget.Omega0",
-          "status": "missing",
-          "golden": 0.2814
-        }
-      ]
-    },
-    "status": "incomplete"
-  },
-  {
     "simulation": "TNG100-1",
     "paper": "/Users/zhangxiaowen/AntigravityProjects/SimAgents/golden_standard/papers/illustrisTNG.pdf",
     "model": "gpt-5.4-mini",
-    "elapsed_seconds": 24.3,
+    "elapsed_seconds": 35.0,
     "score": {
       "total": 19,
-      "correct": 17,
-      "wrong": 1,
+      "correct": 18,
+      "wrong": 0,
       "missing": 1,
-      "extra": 10,
-      "accuracy": 0.8947,
+      "extra": 12,
+      "accuracy": 0.9474,
       "details": [
         {
           "param": "genic.BoxSize",
@@ -336,8 +336,7 @@
         },
         {
           "param": "gadget.OutputList",
-          "status": "wrong",
-          "extracted": "1.0000,0.5000,0.2500,0.1250",
+          "status": "missing",
           "golden": "0.0078,0.0476,0.0769,0.0909,0.1111,0.1429,0.2,0.25,0.3333,0.5,0.6667,0.8333,1.0"
         },
         {
@@ -378,7 +377,8 @@
         },
         {
           "param": "gadget.MassiveNuLinRespOn",
-          "status": "missing",
+          "status": "correct",
+          "extracted": 0,
           "golden": 0
         },
         {
@@ -395,18 +395,18 @@
         }
       ]
     },
-    "status": "complete"
+    "status": "needs_user_input"
   },
   {
     "simulation": "TNG300-1",
     "paper": "/Users/zhangxiaowen/AntigravityProjects/SimAgents/golden_standard/papers/illustrisTNG.pdf",
     "model": "gpt-5.4-mini",
-    "elapsed_seconds": 23.1,
+    "elapsed_seconds": 23.3,
     "score": {
       "total": 25,
       "correct": 24,
-      "wrong": 0,
-      "missing": 1,
+      "wrong": 1,
+      "missing": 0,
       "extra": 6,
       "accuracy": 0.96,
       "details": [
@@ -484,7 +484,8 @@
         },
         {
           "param": "gadget.OutputList",
-          "status": "missing",
+          "status": "wrong",
+          "extracted": "1.0000",
           "golden": "0.02,0.05,0.1,0.2,0.5,1.0"
         },
         {
@@ -567,13 +568,13 @@
     "simulation": "astrid",
     "paper": "/Users/zhangxiaowen/AntigravityProjects/SimAgents/golden_standard/papers/2111.01160v2.pdf",
     "model": "gpt-5.4-mini",
-    "elapsed_seconds": 19.9,
+    "elapsed_seconds": 19.2,
     "score": {
       "total": 35,
       "correct": 18,
       "wrong": 4,
       "missing": 13,
-      "extra": 7,
+      "extra": 8,
       "accuracy": 0.5143,
       "details": [
         {
@@ -700,7 +701,7 @@
         {
           "param": "gadget.TimeMax",
           "status": "correct",
-          "extracted": 1.0,
+          "extracted": 1,
           "golden": 1.0
         },
         {
@@ -781,12 +782,12 @@
     "simulation": "BlueTides",
     "paper": "/Users/zhangxiaowen/AntigravityProjects/SimAgents/golden_standard/papers/bluetides.pdf",
     "model": "gpt-5.4-mini",
-    "elapsed_seconds": 29.4,
+    "elapsed_seconds": 28.4,
     "score": {
       "total": 22,
       "correct": 13,
-      "wrong": 6,
-      "missing": 3,
+      "wrong": 7,
+      "missing": 2,
       "extra": 9,
       "accuracy": 0.5909,
       "details": [
@@ -804,7 +805,8 @@
         },
         {
           "param": "genic.WhichSpectrum",
-          "status": "missing",
+          "status": "correct",
+          "extracted": 2,
           "golden": "2"
         },
         {
@@ -862,7 +864,8 @@
         },
         {
           "param": "gadget.OutputList",
-          "status": "missing",
+          "status": "wrong",
+          "extracted": "0.0078,1.0",
           "golden": "0.010,0.011,0.012,0.013,0.014,0.015,0.016,0.017,0.018,0.019,0.020,0.021,0.022,0.023,0.024,0.025,0.026,0.027,0.028,0.029,0.030,0.031,0.032,0.033,0.034,0.035,0.036,0.037,0.038,0.039,0.040,0.041,0.042,0.043,0.044,0.045,0.046,0.047,0.048,0.049,0.050,0.051,0.052,0.053,0.054,0.055,0.056,0.057,0.058,0.059,0.060,0.061,0.062,0.063,0.064,0.065,0.066,0.067,0.068,0.069,0.070,0.071,0.072,0.073,0.074,0.075,0.076,0.077,0.078,0.079,0.080,0.081,0.082,0.083,0.084,0.085,0.086,0.087,0.088,0.089,0.090,0.091,0.092,0.093,0.094,0.095,0.096,0.097,0.098,0.099,0.100,0.101,0.102,0.103,0.104,0.105,0.106,0.107,0.108,0.111"
         },
         {
@@ -903,8 +906,7 @@
         },
         {
           "param": "gadget.MassiveNuLinRespOn",
-          "status": "correct",
-          "extracted": 0,
+          "status": "missing",
           "golden": "0"
         },
         {
@@ -921,20 +923,20 @@
         }
       ]
     },
-    "status": "incomplete"
+    "status": "needs_user_input"
   },
   {
     "simulation": "L100N1504",
     "paper": "/Users/zhangxiaowen/AntigravityProjects/SimAgents/golden_standard/papers/eagle.pdf",
     "model": "gpt-5.4-mini",
-    "elapsed_seconds": 31.8,
+    "elapsed_seconds": 33.9,
     "score": {
       "total": 22,
-      "correct": 20,
-      "wrong": 1,
+      "correct": 19,
+      "wrong": 2,
       "missing": 1,
-      "extra": 6,
-      "accuracy": 0.9091,
+      "extra": 11,
+      "accuracy": 0.8636,
       "details": [
         {
           "param": "genic.BoxSize",
@@ -1009,8 +1011,8 @@
         },
         {
           "param": "gadget.OutputList",
-          "status": "correct",
-          "extracted": "0.0476,0.0500,0.0526,0.0556,0.0588,0.0625,0.0667,0.0714,0.0769,0.0833,0.0909,0.1000,0.1111,0.1250,0.1429,0.1667,0.2000,0.2500,0.3333,0.5000,1.0000",
+          "status": "wrong",
+          "extracted": "0.0714,0.1000,0.1250,0.1429,0.1667,0.2000,0.2500,0.3333,0.5000,0.6667,0.7500,0.8333,1.0000",
           "golden": "0.047619,0.050000,0.052632,0.055556,0.058824,0.062500,0.066667,0.071429,0.076923,0.083333,0.090909,0.100000,0.111111,0.125000,0.142857,0.166667,0.200000,0.250000,0.333333,0.500000,1.000000"
         },
         {

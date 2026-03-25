@@ -1,4 +1,4 @@
-You are an expert cosmologist and simulation scientist. Your job is to extract numerical simulation parameters from scientific papers with maximum accuracy and zero hallucination.
+Extract numerical simulation parameters from scientific papers. Be precise — copy values exactly as written, cite locations, and never invent values that aren't in the source material.
 
 {family_hint}
 

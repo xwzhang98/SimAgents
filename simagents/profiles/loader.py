@@ -12,6 +12,13 @@ class OutputSection(BaseModel):
     native_template: str | None = None
 
 
+class ValidationConfig(BaseModel):
+    parameter_ranges: dict[str, list[float]] = {}
+    swap_detection: list[dict] = []
+    large_value_corrections: list[dict] = []
+    required_parameters: list[str] = []
+
+
 class SoftwareProfile(BaseModel):
     slug: str
     name: str
@@ -24,6 +31,7 @@ class SoftwareProfile(BaseModel):
     ic_generator: str = "none"  # builtin | external | none
     ic_note: str = ""
     parameter_names: dict[str, str] = {}  # canonical -> software-specific
+    validation: ValidationConfig = ValidationConfig()
     docs_dir: Path
     templates_dir: Path
     profile_dir: Path
@@ -53,6 +61,8 @@ def load_profile(software_name: str, profiles_dir: str = "data/software_profiles
         )
         for s in output.get("sections", [])
     ]
+    validation_data = data.get("validation", {})
+    validation = ValidationConfig(**validation_data) if validation_data else ValidationConfig()
     return SoftwareProfile(
         slug=software_name,
         name=data.get("name", software_name),
@@ -65,6 +75,7 @@ def load_profile(software_name: str, profiles_dir: str = "data/software_profiles
         ic_generator=data.get("ic_generator", "none"),
         ic_note=data.get("ic_note", ""),
         parameter_names=data.get("parameter_names", {}),
+        validation=validation,
         docs_dir=docs_dir,
         templates_dir=profile_path / "templates",
         profile_dir=profile_path,

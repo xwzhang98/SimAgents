@@ -37,3 +37,26 @@ parameter_names:
   starting_redshift: Redshift
   grid_size: Ngrid
   mesh_size: Nmesh
+
+validation:
+  parameter_ranges:
+    Omega0: [0.2, 0.4]
+    OmegaLambda: [0.6, 0.8]
+    OmegaBaryon: [0.02, 0.08]
+    HubbleParam: [0.5, 1.0]
+    Sigma8: [0.5, 1.2]
+  swap_detection:
+    - pair: [Omega0, OmegaLambda]
+      rule: "Omega0 (matter) should be ~0.3, OmegaLambda (dark energy) should be ~0.7"
+  large_value_corrections:
+    - params: [Ngrid, Nmesh]
+      threshold: 50000
+      action: cube_root
+      reason: "Papers write N³ — use the cube root N"
+  required_parameters:
+    - Omega0
+    - OmegaBaryon
+    - OmegaLambda
+    - HubbleParam
+    - BoxSize
+    - Ngrid

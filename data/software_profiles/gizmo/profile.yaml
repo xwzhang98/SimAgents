@@ -35,3 +35,20 @@ parameter_names:
   softening_bulge: SofteningBulge
   softening_stars: SofteningStars
   softening_bndry: SofteningBndry
+
+validation:
+  parameter_ranges:
+    Omega0: [0.2, 0.4]
+    OmegaLambda: [0.6, 0.8]
+    OmegaBaryon: [0.02, 0.08]
+    HubbleParam: [0.5, 1.0]
+  swap_detection:
+    - pair: [Omega0, OmegaLambda]
+      rule: "Omega0 (matter) should be ~0.3, OmegaLambda (dark energy) should be ~0.7"
+  large_value_corrections: []
+  required_parameters:
+    - Omega0
+    - OmegaBaryon
+    - OmegaLambda
+    - HubbleParam
+    - BoxSize
