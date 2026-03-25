@@ -11,7 +11,7 @@ interface ChatPanelProps {
   isExtracting: boolean;
   waitingForInput: boolean;
   pendingQuestions: string[];
-  onFileUpload: (file: File) => void;
+  onFileUpload: (file: File, customPrompt?: string) => void;
   onSendMessage: (text: string) => void;
   onQuickReply: (answers: Record<string, unknown>) => void;
 }
@@ -26,6 +26,7 @@ export default function ChatPanel({
   onQuickReply,
 }: ChatPanelProps) {
   const [inputText, setInputText] = useState("");
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom on new messages
@@ -35,9 +36,19 @@ export default function ChatPanel({
 
   const handleSend = () => {
     const text = inputText.trim();
-    if (!text) return;
-    setInputText("");
-    onSendMessage(text);
+
+    if (pendingFile) {
+      // Upload file + optional custom prompt
+      onFileUpload(pendingFile, text || undefined);
+      setPendingFile(null);
+      setInputText("");
+      return;
+    }
+
+    if (text) {
+      setInputText("");
+      onSendMessage(text);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -45,6 +56,14 @@ export default function ChatPanel({
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const handleFileSelect = (file: File) => {
+    setPendingFile(file);
+  };
+
+  const handleRemoveFile = () => {
+    setPendingFile(null);
   };
 
   return (
@@ -70,7 +89,7 @@ export default function ChatPanel({
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4">
-        {messages.length === 0 && (
+        {messages.length === 0 && !pendingFile && (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#7c3aed]/20 text-[#7c3aed]">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -85,8 +104,8 @@ export default function ChatPanel({
               Upload a Paper
             </h3>
             <p className="max-w-sm text-sm text-[#9ca3af]">
-              Upload a PDF of a scientific paper to extract simulation parameters.
-              Click the paperclip icon below or drag and drop.
+              Upload a PDF and optionally add instructions like
+              &quot;Extract parameters for the TNG300 run only&quot;.
             </p>
           </div>
         )}
@@ -104,26 +123,51 @@ export default function ChatPanel({
 
       {/* Input Area */}
       <div className="border-t border-[#1a1a2e] px-4 py-3">
+        {/* Pending file attachment badge */}
+        {pendingFile && (
+          <div className="mb-2 flex items-center gap-2">
+            <div className="flex items-center gap-2 rounded-lg bg-[#1e1e3a] px-3 py-1.5 text-xs text-[#e2e8f0]">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              {pendingFile.name}
+              <button
+                onClick={handleRemoveFile}
+                className="ml-1 text-[#666] hover:text-[#ff6b6b] transition-colors"
+                title="Remove file"
+              >
+                ✕
+              </button>
+            </div>
+            <span className="text-xs text-[#666]">
+              Press Send or add instructions below
+            </span>
+          </div>
+        )}
+
         <div className="flex items-center gap-2 rounded-xl bg-[#1a1a2e] px-3 py-2">
-          <FileUpload onFileSelect={onFileUpload} disabled={isExtracting} />
+          <FileUpload onFileSelect={handleFileSelect} disabled={isExtracting} />
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={
-              waitingForInput
-                ? "Type your answer..."
-                : isExtracting
-                  ? "Extraction in progress..."
-                  : "Upload a PDF to start..."
+              pendingFile
+                ? 'Add instructions (optional), then press Send...'
+                : waitingForInput
+                  ? "Type your answer..."
+                  : isExtracting
+                    ? "Extraction in progress..."
+                    : "Upload a PDF to start, or type a message..."
             }
             disabled={isExtracting && !waitingForInput}
             className="flex-1 border-none bg-transparent px-2 py-1 text-sm text-[#e2e8f0] placeholder-[#666] outline-none"
           />
           <button
             onClick={handleSend}
-            disabled={(isExtracting && !waitingForInput) || !inputText.trim()}
+            disabled={(isExtracting && !waitingForInput) || (!inputText.trim() && !pendingFile)}
             className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#7c3aed] text-white hover:bg-[#6d28d9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

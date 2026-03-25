@@ -138,11 +138,15 @@ export default function Home() {
   );
 
   const handleFileUpload = useCallback(
-    async (file: File) => {
+    async (file: File, customPrompt?: string) => {
       try {
+        // Show what the user sent
+        const userMsg = customPrompt
+          ? `Uploaded: ${file.name}\n\n${customPrompt}`
+          : `Uploaded: ${file.name}`;
         setMessages((prev) => [
           ...prev,
-          { type: "user", role: "user", content: `Uploaded: ${file.name}` },
+          { type: "user", role: "user", content: userMsg },
         ]);
         setMessages((prev) => [
           ...prev,
@@ -157,7 +161,10 @@ export default function Home() {
         ]);
 
         setIsExtracting(true);
-        const { session_id } = await startExtraction({ file_id });
+        const { session_id } = await startExtraction({
+          file_id,
+          custom_prompt: customPrompt || null,
+        });
         setSessionId(session_id);
         startSSE(session_id);
       } catch (err) {
